@@ -1,0 +1,6 @@
+var Lion;
+Lion?.makeSound(); //Conditional access. If Lion is not null, evaluate Lion.makeSound()
+Lion?.whatAmI();
+
+print (10 ?? 9);
+print (nil ?? 8);

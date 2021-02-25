@@ -1,0 +1,19 @@
+class Animal {
+
+	init(type, sound) {
+		this.type = type;
+		this.sound = sound;
+	}
+	
+	whatAmI() {
+		print "I am a "+this.type+"!";
+	}
+	
+	makeSound() {
+		print this.sound+"!";
+	}
+}
+
+var Tiger = Animal("Tiger", "Roar");
+Tiger.whatAmI();
+Tiger.makeSound();

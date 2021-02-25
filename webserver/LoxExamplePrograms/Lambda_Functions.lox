@@ -1,0 +1,9 @@
+fun accumulate(n, fn) {
+	var acc = 0;
+	for(var i = 0; i < n; i++) {
+		acc= fn(i, acc);
+	}
+	return acc;
+}
+var summation = accumulate(10, fun(x, y) { return x+y;});
+print summation;

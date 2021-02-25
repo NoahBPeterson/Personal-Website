@@ -1,0 +1,20 @@
+class Rubber {
+	material() {
+		return "Rubber";
+	}
+}
+
+class Wheel {
+	shape() {
+		return "Round";
+	}
+}
+
+class Tire < Rubber, Wheel {
+	whatAmI() {
+		print "I am a Tire. My shape is "+this.shape()+", and my material is "+this.material()+".";
+	}
+}
+
+var CarTire = Tire();
+CarTire.whatAmI();

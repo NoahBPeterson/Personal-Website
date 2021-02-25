@@ -1,0 +1,6 @@
+(1 < 2) ? 1+2 : 3+4 //Ternary operator
+
+var i = 0;
+var j = ++i; //Increment, then assign.
+var k = i--; //Assign, then decrement.
+print i; print j; print k;
