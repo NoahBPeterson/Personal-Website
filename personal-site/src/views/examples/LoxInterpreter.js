@@ -25,7 +25,6 @@ import {Button, Card, CardHeader, CardBody,
 // core components
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 import Footer from "components/Footer/Footer.js";
-import LoxBackground from "../../components/Backgrounds/LoxBackground.js"
 
 export default function LoxInterpreter() {
 	const [squares1to6, setSquares1to6] = useState("");
