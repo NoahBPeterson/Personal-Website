@@ -55,9 +55,9 @@ app.get('/loxExamples', cors(), function(req, res) {
 	}
 });
 
-app.post('/loxExamples', cors(), function(req, res) {
+app.post('/loxExamples/:exampleProgram', cors(), function(req, res) {
 	res.header('Access-Control-Allow-Origin', '*');
-	const exampleProgram = parseInt(req.body.text);
+	const exampleProgram = parseInt(req.params.exampleProgram);
 
 	fs.readFile('./LoxExamplePrograms/'+exampleFiles[exampleProgram], 'utf8' , (err, data) => {
 		if (err) {
