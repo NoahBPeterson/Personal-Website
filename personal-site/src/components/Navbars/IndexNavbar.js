@@ -153,12 +153,12 @@ export default function IndexNavbar() {
                   <i className="tim-icons icon-paper" />
                   Documentation
                 </DropdownItem>
-                <DropdownItem tag={Link} to="/register-page">
+                <DropdownItem tag={Link} to="/loxInterpreter">
                   <i className="tim-icons icon-bullet-list-67" />
-                  Register Page
+                  Lox Interpreter
                 </DropdownItem>
                 <DropdownItem tag={Link} to="/landing-page">
-                  <i className="tim-icons icon-image-02" />
+                  <i className="tim-icons icon-spaceship" />
                   Landing Page
                 </DropdownItem>
                 <DropdownItem tag={Link} to="/profile-page">
