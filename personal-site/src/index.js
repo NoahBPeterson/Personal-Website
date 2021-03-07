@@ -26,6 +26,7 @@ import "assets/demo/demo.css";
 import Index from "views/Index.js";
 import LandingPage from "views/examples/LandingPage.js";
 import LoxInterpreter from "views/examples/LoxInterpreter";
+import Projects from "views/Projects.js";
 import ProfilePage from "views/examples/ProfilePage.js";
 
 
@@ -39,6 +40,10 @@ ReactDOM.render(
       <Route
         path="/loxInterpreter"
         render={(props) => <LoxInterpreter {...props} />}
+      />
+      <Route
+        path="/projects"
+        render={(props) => <Projects {...props} />}
       />
       <Route
         path="/profile-page"
