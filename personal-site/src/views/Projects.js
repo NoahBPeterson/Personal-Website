@@ -34,6 +34,9 @@ import NucleoIcons from "views/IndexSections/NucleoIcons.js";
 import Signup from "views/IndexSections/Signup.js";
 import Examples from "views/IndexSections/Examples.js";
 import Download from "views/IndexSections/Download.js";
+import { Container } from "reactstrap";
+import CsLox from "./ProjectSections/csLox";
+
 
 export default function Project() {
   React.useEffect(() => {
@@ -46,14 +49,31 @@ export default function Project() {
   return (
     <>
       <IndexNavbar />
-      <div className="wrapper">
-        <PageHeader />
-        <div className="main">
-          <Basics />
-          <JavaScript />
-        </div>
-        <Footer />
-      </div>
+        <div className="wrapper">
+			<div className="page-header header-filter">
+				<div className="squares square1" />
+				<div className="squares square2" />
+				<div className="squares square3" />
+				<div className="squares square4" />
+				<div className="squares square5" />
+				<div className="squares square6" />
+				<div className="squares square7" />
+				<Container>
+					<div className="content-center brand">
+						<h1 className="h1-seo">
+							Projects
+						</h1>
+					</div>
+				</Container>
+			</div>
+			<div className="main">
+				<CsLox />
+				<JavaScript />
+				<Pagination />
+				<Tabs />
+			</div>
+			<Footer />
+      	</div>
     </>
   );
 }
