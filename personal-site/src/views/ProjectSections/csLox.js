@@ -32,6 +32,8 @@ import {
 	NavLink,
 } from "reactstrap";
 
+import LoxInterpreterComponent from "../examples/LoxInterpreterComponent.js";
+
 export default function CsLox() {
 	const [iconTabs, setIconsTabs] = React.useState(1);
 	const [textTabs, setTextTabs] = React.useState(4);
@@ -43,7 +45,7 @@ export default function CsLox() {
 		</div>
 		<Row>
 			<Col className="ml-auto mr-auto" md="10" xl="6">
-			<Card>
+				<Card>
 					<CardHeader>
 						<Nav className="nav-tabs-info" role="tablist" tabs>
 							<NavItem>
@@ -65,7 +67,7 @@ export default function CsLox() {
 									onClick={(e) => setTextTabs(5)}
 									style={{cursor: "pointer"}}
 								>
-									Settings
+									Language Details
 								</NavLink>
 							</NavItem>
 							<NavItem>
@@ -76,7 +78,7 @@ export default function CsLox() {
 									style={{cursor: "pointer"}}
 									onClick={(e) => setTextTabs(6)}
 									>
-									Options
+									Website Demo
 								</NavLink>
 							</NavItem>
 						</Nav>
@@ -84,33 +86,32 @@ export default function CsLox() {
 					<CardBody>
 						<TabContent className="tab-space" activeTab={"link" + textTabs}>
 							<TabPane tabId="link4">
-								<Row>
-									<Col>
-										<p>
-											csLox is an interpreter for the Lox programming language.
-										</p>
-									</Col>
-									<Col>
-										<p>
-											Lox is a dynamically typed functional programming language with support for objects.
-										</p>
-									</Col>
-								</Row>
+								<p>
+									csLox is an interpreter for the Lox programming language.
+									It is a treewalk interpreter, which executes code by traversing the abstract syntax tree.
+
+								</p>
 							</TabPane>
 							<TabPane tabId="link5">
 								<p>
-									csLox is a treewalk interpreter, which executes code by traversing the abstract syntax tree.
+									Lox is a dynamically typed functional programming language with support for objects. Variables
+									are statically scoped, and can be one of four types: a floating point number, a boolean, a string,
+									and nil.
+								</p>
+								<p>
+									A full language specification is available here:
+									<a href="https://github.com/NoahBPeterson/csLox">
+										&nbsp;
+										<i className="fab fa-github">NoahBPeterson/csLox</i>		
+									</a>
 								</p>
 							</TabPane>
 							<TabPane tabId="link6">
 								<p>
-									I think that’s a responsibility that I have, to push
-									possibilities, to show people, this is the level that
-									things could be at. So when you get something that has the
-									name Kanye West on it, it’s supposed to be pushing the
-									furthest possibilities. I will be the leader of a company
-									that ends up being worth billions of dollars, because I
-									got the answers. I understand culture. I am the nucleus.
+									The Lox interpreter program is run by a Node.js application. This app accepts program text 
+									given to it from the demo, which is put into a named file that is used as an argument when 
+									running the interpreter. The output of the interpreter is then sent to the website. It times 
+									out after five seconds to avoid instances of the interpreter never exiting.
 								</p>
 							</TabPane>
 						</TabContent>
@@ -118,6 +119,7 @@ export default function CsLox() {
 				</Card>
 			</Col>
 			<Col className="ml-auto mr-auto" md="10" xl="6">
+				<LoxInterpreterComponent />
 			</Col>
 		</Row>
 		</Container>
