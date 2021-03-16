@@ -137,6 +137,7 @@ export default function IndexNavbar() {
                 <p className="d-lg-none d-xl-none">LinkedIn</p>
               </NavLink>
             </NavItem>
+            {/*
             <UncontrolledDropdown nav>
               <DropdownToggle
                 caret
@@ -167,6 +168,7 @@ export default function IndexNavbar() {
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
+            */}
             <NavItem>
               <Button
                 className="nav-link d-none d-lg-block"
