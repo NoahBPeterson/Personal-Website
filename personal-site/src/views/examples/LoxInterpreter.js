@@ -80,14 +80,17 @@ export default function LoxInterpreter() {
 							/>
 							<Card className="card-register">
 								<CardHeader>
-									<CardTitle tag="h4" style={{WebkitFilter: "invert(100%)", textAlign: "center"}}> cslox</CardTitle>
+									<CardTitle tag="h4" style={{WebkitFilter: "invert(100%)", textAlign: "center"}}> csLox</CardTitle>
 								</CardHeader>
-								<CardBody />
-								<CardFooter>
-									<Button className="btn-round" color="primary" size="lg">
-										Get Started
-									</Button>
-								</CardFooter>
+								<CardBody>
+									<p>
+										A full language specification is available at the GitHub repository:
+										<a href="https://github.com/NoahBPeterson/csLox">
+											&nbsp;
+											<i className="fab fa-github"><i style={{fontSize: "0.5rem"}}>&nbsp;</i>NoahBPeterson/csLox</i>		
+										</a>
+									</p>
+								</CardBody>
 							</Card>
 						</Col>
 						<Col>
