@@ -91,18 +91,16 @@ export default function LoxInterpreterComponent() {
 			</CardBody>
 		</Card>
 		<Row>
-			<Col></Col>
-			<Col>
-				<select onClick={() => getExamples()} className="dropdown-with-icons" aria-labelledby="navbarDropdownMenuLink">
-					<option value={-1} key={-1}>Example Programs</option>
-					{programExamples}
-				</select>
-			</Col>
-			<Col></Col>
 			<Col>
 				<Button className="btn-round" color="primary" size="lg" onClick={() => runProgram()}>
 					Run
 				</Button>
+			</Col>
+			<Col style={{top: "1rem"}}>
+				<select onClick={() => getExamples()} className="dropdown-with-icons" aria-labelledby="navbarDropdownMenuLink">
+					<option value={-1} key={-1}>Example Programs</option>
+					{programExamples}
+				</select>
 			</Col>
 		</Row>	
 	</>
