@@ -19,7 +19,6 @@ import React from "react";
 
 // core components
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
-import PageHeader from "components/PageHeader/PageHeader.js";
 import Footer from "components/Footer/Footer.js";
 
 // sections for this page/view
@@ -35,7 +34,12 @@ import Signup from "views/IndexSections/Signup.js";
 import Examples from "views/IndexSections/Examples.js";
 import Download from "views/IndexSections/Download.js";
 import { Container } from "reactstrap";
+
+import BackgroundBubbles from "./ProjectSections/backgroundBubbles";
+
+
 import CsLox from "./ProjectSections/csLox";
+import BlockTrack from "./ProjectSections/blockTrack";
 
 
 export default function Project() {
@@ -67,10 +71,9 @@ export default function Project() {
 				</Container>
 			</div>
 			<div className="main">
+				<BackgroundBubbles />
 				<CsLox />
-				<JavaScript />
-				<Pagination />
-				<Tabs />
+				<BlockTrack />		
 			</div>
 			<Footer />
       	</div>
