@@ -33,23 +33,23 @@ import ProfilePage from "views/examples/ProfilePage.js";
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
-      <Route
-        path="/landing-page"
-        render={(props) => <LandingPage {...props} />}
-      />
-      <Route
-        path="/loxInterpreter"
-        render={(props) => <LoxInterpreter {...props} />}
-      />
-      <Route
-        path="/projects"
-        render={(props) => <Projects {...props} />}
-      />
-      <Route
-        path="/profile-page"
-        render={(props) => <ProfilePage {...props} />}
-      />
-      <Route path="/" render={(props) => <Index {...props} />} />
+    	<Route
+        	path="/loxInterpreter"
+        	render={(props) => <LoxInterpreter {...props} />}
+      	/>
+      	<Route
+			path="/projects"
+			render={(props) => <Projects {...props} />}
+		/>
+		{/*<Route
+			path="/landing-page"
+			render={(props) => <LandingPage {...props} />}
+		/>
+		<Route
+			path="/profile-page"
+			render={(props) => <ProfilePage {...props} />}
+		/>*/}
+      	<Route path="/" render={(props) => <Index {...props} />} />
     </Switch>
   </BrowserRouter>,
   document.getElementById("root")
