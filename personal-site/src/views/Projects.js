@@ -70,7 +70,7 @@ export default function Project() {
 					</div>
 				</Container>
 			</div>
-			<div className="main">
+			<div className="main section section-javascript" id="javascriptComponents">
 				<BackgroundBubbles />
 				<CsLox />
 				<BlockTrack />		
