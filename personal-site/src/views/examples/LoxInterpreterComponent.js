@@ -80,7 +80,8 @@ export default function LoxInterpreterComponent() {
 					style={{height: '10rem', WebkitFilter: "brightness(1000%)", border: "0.0625rem solid", padding: "0.625rem", fontSize: "1rem", zIndex: 900}}
 					id="input" 
 					rows={10} cols={60} 
-					value= {programText}
+					value={programText}
+					maxLength={10000}
 					onChange={(event) => setProgramText(event.target.value)} />
 			</CardBody>
 			<CardBody style={{borderColor: "#8c3db9"}}>

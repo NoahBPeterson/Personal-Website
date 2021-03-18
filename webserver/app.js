@@ -73,6 +73,12 @@ app.post('/loxExamples/:exampleProgram', cors(), function(req, res) {
 app.post('/loxOutput', cors(), function(req, res) {
 	res.header('Access-Control-Allow-Origin', '*');
 
+	if(req.body.text.length > 10000)
+	{
+		res.json("Cannot send more than 10k characters.");
+		return;
+	}
+
 	var threadSafeCounter = counter++;
 	var location = './LoxPrograms/lox'+threadSafeCounter+'.lox';
 	var execute = 'Lox '+location+' timeout=5';
