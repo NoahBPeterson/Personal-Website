@@ -91,7 +91,10 @@ app.post('/loxOutput', cors(), function(req, res) {
 		if(err) {
 			res.json(data.toString());
 		} else 
-			res.json(data.toString());											 
+			res.json(data.toString());
+			fs.unlink(location, (err) => {
+				if(err) throw err;
+			})											 
 	});
 });
 
