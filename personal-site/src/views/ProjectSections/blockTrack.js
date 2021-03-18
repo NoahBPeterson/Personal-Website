@@ -40,7 +40,7 @@ export default function BlockTrack() {
 		<Container>
 			<div className="title">
 				<h1 className="mb-3" >
-					<img src="https://cloudburstmc.org/data/resource_icons/0/477.jpg" />
+					<img src={require("assets/img/BlockTrackIcon.png").default} />
 					<i style={{fontSize: "1rem"}}>&nbsp;</i>
 					BlockTrack
 				</h1>
