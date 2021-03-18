@@ -40,6 +40,7 @@ import BackgroundBubbles from "./ProjectSections/backgroundBubbles";
 
 import CsLox from "./ProjectSections/csLox";
 import BlockTrack from "./ProjectSections/blockTrack";
+import SpawnerTiers from "./ProjectSections/spawnerTiers";
 
 
 export default function Project() {
@@ -73,7 +74,8 @@ export default function Project() {
 			<div className="main section section-javascript" id="javascriptComponents">
 				<BackgroundBubbles />
 				<CsLox />
-				<BlockTrack />		
+				<BlockTrack />	
+				<SpawnerTiers />	
 			</div>
 			<Footer />
       	</div>
