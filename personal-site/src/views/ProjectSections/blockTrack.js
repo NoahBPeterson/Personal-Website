@@ -39,8 +39,9 @@ export default function BlockTrack() {
 	<div className="section section-tabs">
 		<Container>
 			<div className="title">
-				<h1 className="mb-3">
-					<img src="https://cloudburstmc.org/data/resource_icons/0/477.jpg"/>
+				<h1 className="mb-3" >
+					<img src="https://cloudburstmc.org/data/resource_icons/0/477.jpg" />
+					<i style={{fontSize: "1rem"}}>&nbsp;</i>
 					BlockTrack
 				</h1>
 			</div>
