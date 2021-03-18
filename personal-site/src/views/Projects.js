@@ -72,10 +72,13 @@ export default function Project() {
 				</Container>
 			</div>
 			<div className="main section section-javascript" id="javascriptComponents">
-				<BackgroundBubbles />
+				<BackgroundBubbles value={0}/>
 				<CsLox />
 				<BlockTrack />	
-				<SpawnerTiers />	
+				<div className="section section-navbars">
+					<BackgroundBubbles value={1}/>
+					<SpawnerTiers />
+				</div>
 			</div>
 			<Footer />
       	</div>
