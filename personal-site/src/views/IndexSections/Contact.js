@@ -86,18 +86,10 @@ export default function Contact() {
 										className="btn-round float-right"
 										color="primary"
 										data-placement="right"
-										id="tooltip341148792"
 										type="button"
 										>
 											Send message
 									</Button>
-									<UncontrolledTooltip
-										delay={0}
-										placement="right"
-										target="tooltip341148792"
-										>
-											Can't wait for your message
-									</UncontrolledTooltip>
 								</Form>
 							</CardBody>
 						</Card>

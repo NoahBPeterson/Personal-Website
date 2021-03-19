@@ -50,7 +50,6 @@ export default function Index() {
       <div className="wrapper">
         <PageHeader />
         <div className="main">
-          <Contact />
         </div>
         <Footer />
       </div>
