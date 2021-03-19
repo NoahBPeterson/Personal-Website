@@ -81,7 +81,7 @@ app.post('/loxOutput', cors(), function(req, res) {
 
 	var threadSafeCounter = counter++;
 	var location = './LoxPrograms/lox'+threadSafeCounter+'.lox';
-	var execute = 'Lox '+location+' timeout=5';
+	var execute = 'dotnet Lox.dll '+location+' timeout=5';
 
 	fs.writeFileSync(location, req.body.text, err => {
 		if(err) throw err;
