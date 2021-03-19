@@ -37,6 +37,7 @@ export default function LoxInterpreterComponent() {
 	}
 	
 	const getExamples = async () => {
+		if(programExamples.length > 0) return;
 		const result = await fetch('http://localhost:5000/loxExamples', {
 			method: 'get',
 			headers: {
