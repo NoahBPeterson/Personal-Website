@@ -25,7 +25,7 @@ export default function LoxInterpreterComponent() {
 	const [exampleText, setExampleText] = useState('');
 	
 	const runProgram = async () => {
-		const result = await fetch(`http://localhost:5000/loxOutput`, {
+		const result = await fetch(`/loxOutput`, {
 			method: 'post',
 			body: JSON.stringify({ text: programText }),
 			headers: {
@@ -38,7 +38,7 @@ export default function LoxInterpreterComponent() {
 	
 	const getExamples = async () => {
 		if(programExamples.length > 0) return;
-		const result = await fetch('http://localhost:5000/loxExamples', {
+		const result = await fetch('/loxExamples', {
 			method: 'get',
 			headers: {
 			'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default function LoxInterpreterComponent() {
 	}
 
 	const getExampleText = async (chosenExample) => {
-		const result = await fetch('http://localhost:5000/loxExamples/'+chosenExample, {
+		const result = await fetch('/loxExamples/'+chosenExample, {
 			method: 'post',
 			body: JSON.stringify(
 			{ 
