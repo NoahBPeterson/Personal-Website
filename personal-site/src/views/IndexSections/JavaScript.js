@@ -18,7 +18,7 @@
 import React from "react";
 import classnames from "classnames";
 // react plugin used to create datetimepicker
-import ReactDatetime from "react-datetime";
+//import ReactDatetime from "react-datetime";
 
 // reactstrap components
 import {
@@ -35,7 +35,7 @@ import {
   Form,
   Input,
   InputGroup,
-  InputGroupAddon,
+  //InputGroupAddon,
   InputGroupText,
   Label,
   UncontrolledCarousel,
@@ -210,11 +210,11 @@ export default function JavaScript() {
                       "input-group-focus": emailFocus,
                     })}
                   >
-                    <InputGroupAddon addonType="prepend">
+                    <div InputGroupAddon addonType="prepend">
                       <InputGroupText>
                         <i className="tim-icons icon-email-85" />
                       </InputGroupText>
-                    </InputGroupAddon>
+                    </div>
                     <Input
                       placeholder="Email"
                       type="email"
@@ -229,11 +229,11 @@ export default function JavaScript() {
                       "input-group-focus": passwordFocus,
                     })}
                   >
-                    <InputGroupAddon addonType="prepend">
+                    <div InputGroupAddon addonType="prepend">
                       <InputGroupText>
                         <i className="tim-icons icon-key-25" />
                       </InputGroupText>
-                    </InputGroupAddon>
+                    </div>
                     <Input
                       placeholder="Password"
                       type="password"
@@ -266,7 +266,7 @@ export default function JavaScript() {
           <Col md="4">
             <div className="datepicker-container">
               <FormGroup>
-                <ReactDatetime
+                <div ReactDatetime
                   inputProps={{
                     className: "form-control",
                     placeholder: "Date Picker Here",

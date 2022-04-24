@@ -25,9 +25,9 @@ import {
   Button,
   Label,
   FormGroup,
-  CustomInput,
+  //CustomInput,
   Input,
-  InputGroupAddon,
+  //InputGroupAddon,
   InputGroupText,
   InputGroup,
   Container,
@@ -175,11 +175,11 @@ export default function Basics() {
                   "input-group-focus": inputFocus,
                 })}
               >
-                <InputGroupAddon addonType="prepend">
+                <div InputGroupAddon addonType="prepend">
                   <InputGroupText>
                     <i className="fa fa-user" />
                   </InputGroupText>
-                </InputGroupAddon>
+                </div>
                 <Input
                   placeholder="Left Font Awesome Icon"
                   type="text"
@@ -191,11 +191,11 @@ export default function Basics() {
             <Col lg="3" sm="6">
               <InputGroup>
                 <Input placeholder="Right Nucleo Icon" type="text" />
-                <InputGroupAddon addonType="append">
+                <div InputGroupAddon addonType="append">
                   <InputGroupText>
                     <i className="tim-icons icon-lock-circle" />
                   </InputGroupText>
-                </InputGroupAddon>
+                </div>
               </InputGroup>
             </Col>
           </Row>
@@ -290,9 +290,9 @@ export default function Basics() {
           </Col>
           <Col lg="3" sm="6">
             <p className="category">Toggle Buttons</p>
-            <CustomInput type="switch" id="switch-1" />
+            <div CustomInput type="switch" id="switch-1" />
             <br />
-            <CustomInput type="switch" id="switch-2" label="With label" />
+            <div CustomInput type="switch" id="switch-2" label="With label" />
           </Col>
           <Col lg="3" sm="6">
             <p className="category">Sliders</p>
