@@ -50,7 +50,15 @@ export default function LoxInterpreterComponent() {
 		for(const [index, value] of body.entries ()) {
 			
 			items.push(
-				<option value={index} key={index} onClick={() => getExampleText(index)}>{value}</option>
+				<option 
+					style={{cursor:'pointer'}}
+					readOnly
+					value={index} key={index}
+					onTouchStart={() => getExampleText(index)}
+					onChange={() => function(){}}
+					onClick={() => getExampleText(index)}>
+						{value}
+				</option>
 			)
 		}
 		setProgramExamples(items);
@@ -72,6 +80,8 @@ export default function LoxInterpreterComponent() {
 		setProgramText(body);
 	}
 
+	getExamples();
+
 	return (
 	<>
 		<Card>
@@ -80,7 +90,7 @@ export default function LoxInterpreterComponent() {
 					className="form-control-plaintext" 
 					style={{height: '10rem', WebkitFilter: "brightness(1000%)", border: "0.0625rem solid", padding: "0.625rem", fontSize: "1rem", zIndex: 900}}
 					id="input" 
-					rows={10} cols={60} 
+					rows={10} cols={60}
 					value={programText}
 					maxLength={10000}
 					onChange={(event) => setProgramText(event.target.value)} />
@@ -89,7 +99,10 @@ export default function LoxInterpreterComponent() {
 				<textarea 
 					className="form-control" 
 					style={{borderColor: "#8c3db9", WebkitFilter: "brightness(1000%)", border: "0.0625rem solid", padding: "0.625rem", fontSize: "1rem", zIndex: 900}}
-					id="output" rows={3} cols={50} value={programResult}/>
+					id="output"
+					rows={3} cols={50}
+					onChange={() => {}}
+					value={programResult}/>
 			</CardBody>
 		</Card>
 		<Row>
@@ -99,7 +112,13 @@ export default function LoxInterpreterComponent() {
 				</Button>
 			</Col>
 			<Col style={{top: "1rem"}}>
-				<select onClick={() => getExamples()} className="dropdown-with-icons" aria-labelledby="navbarDropdownMenuLink">
+				<select  
+					name="options"
+					onClick={() => getExamples()}
+					onChange={e => {getExamples(); getExampleText(e.target.value);}}
+					className="dropdown-with-icons"
+					aria-labelledby="navbarDropdownMenuLink"
+				>
 					<option value={-1} key={-1}>Example Programs</option>
 					{programExamples}
 				</select>
