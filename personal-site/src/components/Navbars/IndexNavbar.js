@@ -171,20 +171,24 @@ export default function IndexNavbar() {
             */}
             <NavItem>
               <Button
-                className="nav-link d-none d-lg-block"
+                className="nav-link d-lg-block"
                 color="primary"
                 href="/loxInterpreter"
               >
+                <p></p>
                 <i className="tim-icons icon-spaceship" /> Lox Interpreter
+                <p></p>
               </Button>
             </NavItem>
             <NavItem>
               <Button
-                className="nav-link d-none d-lg-block"
+                className="nav-link d-lg-block"
                 color="default"
                 href="/projects"
               >
+                <p></p>
                 <i className="fas fa-cubes"></i> Projects
+                <p></p>
               </Button>
             </NavItem>
           </Nav>
