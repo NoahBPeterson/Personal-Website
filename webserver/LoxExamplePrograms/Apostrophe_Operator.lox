@@ -1,0 +1,9 @@
+class Car {}
+
+var Toyota = Car();
+Toyota's model = "Camry";
+print Toyota's model;
+
+var Lexus = Car();
+Lexus' model = "ES";
+print Lexus' model;
