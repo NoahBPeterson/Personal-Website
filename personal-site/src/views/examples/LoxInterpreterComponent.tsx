@@ -33,7 +33,6 @@ export default function LoxInterpreterComponent() {
 			}
 		});
 		const body = await result.json();
-		console.log("body: ", body);
 		setProgramResult(body);
 	}
 	
@@ -65,7 +64,7 @@ export default function LoxInterpreterComponent() {
 	}
 
 	const getExampleText = async (chosenExample: number) => {
-		const result = await fetch('/loxExamples/'+chosenExample, {
+		const result = await fetch('http://noahpeterson.me:5000/loxExamples/'+chosenExample, {
 			method: 'post',
 			body: JSON.stringify(
 			{ 

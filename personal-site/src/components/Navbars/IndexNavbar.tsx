@@ -35,48 +35,45 @@ export default function IndexNavbar() {
   const [collapseOpen, setCollapseOpen] = React.useState(false);
   const [collapseOut, setCollapseOut] = React.useState("");
   const [color, setColor] = React.useState("navbar-transparent");
+
   React.useEffect(() => {
     window.addEventListener("scroll", changeColor);
     return function cleanup() {
       window.removeEventListener("scroll", changeColor);
     };
-  },[]);
+  }, []);
+
   const changeColor = () => {
-    if (
-      document.documentElement.scrollTop > 99 ||
-      document.body.scrollTop > 99
-    ) {
+    if (document.documentElement.scrollTop > 99 || document.body.scrollTop > 99) {
       setColor("bg-info");
-    } else if (
-      document.documentElement.scrollTop < 100 ||
-      document.body.scrollTop < 100
-    ) {
+    } else if (document.documentElement.scrollTop < 100 || document.body.scrollTop < 100) {
       setColor("navbar-transparent");
     }
   };
+
   const toggleCollapse = () => {
     document.documentElement.classList.toggle("nav-open");
     setCollapseOpen(!collapseOpen);
   };
+
   const onCollapseExiting = () => {
     setCollapseOut("collapsing-out");
   };
+
   const onCollapseExited = () => {
     setCollapseOut("");
   };
-  const scrollToDownload = () => {
-      document.getElementById("download-section")?.scrollIntoView({ behavior: "smooth" });
-  };
+
   return (
-    <Navbar className={"fixed-top " + color} color-on-scroll="100" expand="lg">
+    <Navbar className={`fixed-top ${color} backdrop-blur-sm transition-colors duration-200`} expand="lg">
       <Container>
         <div className="navbar-translate">
           <NavbarBrand to="/" tag={Link} id="navbar-brand">
-            <img src="icon.png" style={{WebkitFilter: "invert(100%)"}}/>
-          </NavbarBrand>          
+            <img src="icon.png" className="invert" alt="Logo" />
+          </NavbarBrand>
           <button
             aria-expanded={collapseOpen}
-            className="navbar-toggler navbar-toggler"
+            className="navbar-toggler"
             onClick={toggleCollapse}
           >
             <span className="navbar-toggler-bar bar1" />
@@ -94,7 +91,7 @@ export default function IndexNavbar() {
           <div className="navbar-collapse-header">
             <Row>
               <Col className="collapse-brand" xs="6">
-                <img src="icon.png" style={{WebkitFilter: "invert(100%)"}}/>
+                <img src="icon.png" className="invert" alt="Logo" />
               </Col>
               <Col className="collapse-close text-right" xs="6">
                 <button
@@ -114,8 +111,9 @@ export default function IndexNavbar() {
                 href="https://github.com/NoahBPeterson"
                 rel="noopener noreferrer"
                 target="_blank"
+                className="hover:text-white/80 transition-colors duration-200"
               >
-                <i className="fab fa-github"></i>
+                <i className="fab fa-github" />
                 <p className="d-lg-none d-xl-none">GitHub</p>
               </NavLink>
             </NavItem>
@@ -125,63 +123,30 @@ export default function IndexNavbar() {
                 href="https://www.linkedin.com/in/noah-peterson-a1b0a1149/"
                 rel="noopener noreferrer"
                 target="_blank"
+                className="hover:text-white/80 transition-colors duration-200"
               >
-                <i className="fab fa-linkedin"></i>
+                <i className="fab fa-linkedin" />
                 <p className="d-lg-none d-xl-none">LinkedIn</p>
               </NavLink>
             </NavItem>
-            {/*
-            <UncontrolledDropdown nav>
-              <DropdownToggle
-                caret
-                color="default"
-                data-toggle="dropdown"
-                nav
-                onClick={(e) => e.preventDefault()}
-              >
-                <i className="fa fa-cogs d-lg-none d-xl-none" />
-                Getting started
-              </DropdownToggle>
-              <DropdownMenu className="dropdown-with-icons">
-                <DropdownItem href="https://demos.creative-tim.com/blk-design-system-react/#/documentation/overview">
-                  <i className="tim-icons icon-paper" />
-                  Documentation
-                </DropdownItem>
-                <DropdownItem tag={Link} to="/loxInterpreter">
-                  <i className="tim-icons icon-bullet-list-67" />
-                  Lox Interpreter
-                </DropdownItem>
-                <DropdownItem tag={Link} to="/landing-page">
-                  <i className="tim-icons icon-spaceship" />
-                  Landing Page
-                </DropdownItem>
-                <DropdownItem tag={Link} to="/profile-page">
-                  <i className="tim-icons icon-single-02" />
-                  Profile Page
-                </DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
-            */}
             <NavItem>
               <Button
                 className="nav-link d-lg-block"
                 color="primary"
-                href="/loxInterpreter"
+                tag={Link}
+                to="/loxInterpreter"
               >
-                <p></p>
                 <i className="tim-icons icon-spaceship" /> Lox Interpreter
-                <p></p>
               </Button>
             </NavItem>
             <NavItem>
               <Button
                 className="nav-link d-lg-block"
                 color="default"
-                href="/projects"
+                tag={Link}
+                to="/projects"
               >
-                <p></p>
-                <i className="fas fa-cubes"></i> Projects
-                <p></p>
+                <i className="fas fa-cubes" /> Projects
               </Button>
             </NavItem>
           </Nav>

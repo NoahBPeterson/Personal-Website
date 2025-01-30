@@ -1,13 +1,47 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#1f2251] text-white font-poppins;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  .navbar-transparent {
+    @apply bg-transparent backdrop-blur-sm;
+  }
+
+  .navbar-nav .nav-item .nav-link {
+    @apply text-white/70 hover:text-white transition-colors duration-200;
+  }
+
+  .btn-simple {
+    @apply bg-transparent border border-white/20 hover:bg-white/10 transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-states focus:ring-2 focus:ring-primary/50 transition-all duration-200;
+  }
+
+  .btn-info {
+    @apply bg-info hover:bg-info-states focus:ring-2 focus:ring-info/50 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-background-black/90 backdrop-blur-sm border border-white/10;
+  }
+
+  .card-header {
+    @apply border-b border-white/10;
+  }
+
+  .nav-tabs .nav-item .nav-link {
+    @apply text-white/70 hover:text-white border-b-2 border-transparent hover:border-white/20 transition-colors duration-200;
+  }
+
+  .nav-tabs .nav-item .nav-link.active {
+    @apply text-white border-b-2 border-primary;
+  }
 }
