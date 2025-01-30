@@ -21,9 +21,9 @@ import {Button, Card, CardHeader, CardBody,
 		CardFooter, CardTitle, Container, Row, Col } from "reactstrap";
 
 // core components
-import IndexNavbar from "components/Navbars/IndexNavbar.js";
-import Footer from "components/Footer/Footer.js";
-import LoxInterpreterComponent from "./LoxInterpreterComponent.js";
+import IndexNavbar from "../../components/Navbars/IndexNavbar.tsx";
+import Footer from "../../components/Footer/Footer.tsx";
+import LoxInterpreterComponent from "./LoxInterpreterComponent.tsx";
 
 export default function LoxInterpreter() {
 	const [squares1to6, setSquares1to6] = useState("");
@@ -39,23 +39,23 @@ export default function LoxInterpreter() {
 		};
 	},[]);
 
-	const followCursor = (event) => {
-	let posX = event.clientX - window.innerWidth / 2;
-	let posY = event.clientY - window.innerWidth / 6;
-	setSquares1to6(
-		"perspective(500px) rotateY(" +
-		posX * 0.05 +
-		"deg) rotateX(" +
-		posY * -0.05 +
-		"deg)"
-	);
-	setSquares7and8(
-		"perspective(500px) rotateY(" +
-		posX * 0.02 +
-		"deg) rotateX(" +
-		posY * -0.02 +
-		"deg)"
+	const followCursor = (event: MouseEvent) => {
+		let posX = event.clientX - window.innerWidth / 2;
+		let posY = event.clientY - window.innerWidth / 6;
+		setSquares1to6(
+			"perspective(500px) rotateY(" +
+			posX * 0.05 +
+			"deg) rotateX(" +
+			posY * -0.05 +
+			"deg)"
 		);
+		setSquares7and8(
+			"perspective(500px) rotateY(" +
+			posX * 0.02 +
+			"deg) rotateX(" +
+			posY * -0.02 +
+			"deg)"
+			);
 	};
 
 	return (

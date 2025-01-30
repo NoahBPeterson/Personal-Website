@@ -23,9 +23,9 @@
     "react-chartjs-2": "4.1.0",
     "react-dom": "18.0.0",
     "react-router-dom": "6.3.0",
-    "react-scripts": "5.0.1",
-    "reactstrap": "9.0.2",
-    "web-vitals": "2.1.4"
+    "reactstrap": "^9.2.3",
+    "web-vitals": "2.1.4",
+    "sass": "^1.72.0"
   },
   "optionalDependencies": {
     "jquery": "3.6.0",
@@ -33,14 +33,10 @@
   },
   "proxy": "http://noahpeterson.me:5000/",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build && gulp licenses",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
-    "compile-sass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js src/assets/scss/blk-design-system-react.scss src/assets/css/blk-design-system-react.css",
-    "minify-sass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js src/assets/scss/blk-design-system-react.scss src/assets/css/blk-design-system-react.min.css --output-style compressed",
-    "map-sass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js src/assets/scss/blk-design-system-react.scss src/assets/css/blk-design-system-react.css --source-map true"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "install:clean": "rm -rf node_modules/ && rm -rf bun.lockb && bun install && bun start"
   },
   "eslintConfig": {
     "extends": [
@@ -59,5 +55,17 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "@types/react": "18.2.0",
+    "@types/react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/reactstrap": "^8.7.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.2.0",
+    "vite-plugin-mdx": "^3.0.0"
   }
 }

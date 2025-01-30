@@ -23,11 +23,12 @@ import "assets/css/nucleo-icons.css";
 import "assets/scss/blk-design-system-react.scss?v=1.2.0";
 import "assets/demo/demo.css";
 
-import Index from "views/Index.js";
-import LoxInterpreter from "views/examples/LoxInterpreter";
-import Projects from "views/Projects.js";
+import Index from "./views/Index";
+import LoxInterpreter from "./views/examples/LoxInterpreter";
+import Projects from "./views/Projects";
 
 const container = document.getElementById('root');
+if (!container) throw new Error('Root element not found');
 const root = createRoot(container);
 root.render(
   <BrowserRouter>

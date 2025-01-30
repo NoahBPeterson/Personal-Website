@@ -16,7 +16,7 @@
 
 */
 import React from "react";
-import classnames from "classnames";
+import BlockTrackIcon from "assets/img/BlockTrackIcon.png";
 // reactstrap components
 import {
 	TabContent,
@@ -40,7 +40,7 @@ export default function BlockTrack() {
 		<Container>
 			<div className="title">
 				<h1 className="mb-3" >
-					<img src={require("assets/img/BlockTrackIcon.png").default} />
+					<img src={BlockTrackIcon} />
 					<i style={{fontSize: "1rem"}}>&nbsp;</i>
 					BlockTrack
 				</h1>
@@ -48,7 +48,7 @@ export default function BlockTrack() {
 			<Row>
 				<Col className="ml-auto mr-auto" md="10" xl="6">
 					<iframe width="560" height="315" 
-						src="https://www.youtube.com/embed/k2hY17WVuaU" frameborder="0"
+						src="https://www.youtube.com/embed/k2hY17WVuaU"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 						allowFullScreen/>
 				</Col>
@@ -58,9 +58,7 @@ export default function BlockTrack() {
 							<Nav className="nav-tabs-info" role="tablist" tabs>
 								<NavItem>
 									<NavLink
-										className={classnames({
-										active: textTabs === 4,
-										})}
+										className={`${textTabs === 4 ? 'active' : ''}`}
 										onClick={(e) => setTextTabs(4)}
 										style={{cursor: "pointer"}}
 									>
@@ -69,9 +67,7 @@ export default function BlockTrack() {
 								</NavItem>
 								<NavItem>
 									<NavLink
-										className={classnames({
-										active: textTabs === 5,
-										})}
+										className={`${textTabs === 5 ? 'active' : ''}`}
 										onClick={(e) => setTextTabs(5)}
 										style={{cursor: "pointer"}}
 									>

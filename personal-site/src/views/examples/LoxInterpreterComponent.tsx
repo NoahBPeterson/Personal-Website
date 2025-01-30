@@ -21,11 +21,11 @@ import {Button, Card, CardBody, Row, Col } from "reactstrap";
 export default function LoxInterpreterComponent() {
 	const [programText, setProgramText] = useState('print "Hello, world!";');
 	const [programResult, setProgramResult] = useState('');
-	const [programExamples, setProgramExamples] = useState('');
+	const [programExamples, setProgramExamples] = useState<JSX.Element[]>([]);
 	const [exampleText, setExampleText] = useState('');
 	
 	const runProgram = async () => {
-		const result = await fetch(`/loxOutput`, {
+		const result = await fetch(`http://noahpeterson.me:5000/loxOutput`, {
 			method: 'post',
 			body: JSON.stringify({ text: programText }),
 			headers: {
@@ -33,12 +33,13 @@ export default function LoxInterpreterComponent() {
 			}
 		});
 		const body = await result.json();
-		setProgramResult(body.trim());
+		console.log("body: ", body);
+		setProgramResult(body);
 	}
 	
 	const getExamples = async () => {
 		if(programExamples.length > 0) return;
-		const result = await fetch('/loxExamples', {
+		const result = await fetch('http://noahpeterson.me:5000/loxExamples', {
 			method: 'get',
 			headers: {
 			'Content-Type': 'application/json',
@@ -52,7 +53,6 @@ export default function LoxInterpreterComponent() {
 			items.push(
 				<option 
 					style={{cursor:'pointer'}}
-					readOnly
 					value={index} key={index}
 					onTouchStart={() => getExampleText(index)}
 					onChange={() => function(){}}
@@ -64,7 +64,7 @@ export default function LoxInterpreterComponent() {
 		setProgramExamples(items);
 	}
 
-	const getExampleText = async (chosenExample) => {
+	const getExampleText = async (chosenExample: number) => {
 		const result = await fetch('/loxExamples/'+chosenExample, {
 			method: 'post',
 			body: JSON.stringify(
@@ -115,7 +115,7 @@ export default function LoxInterpreterComponent() {
 				<select  
 					name="options"
 					onClick={() => getExamples()}
-					onChange={e => {getExamples(); getExampleText(e.target.value);}}
+					onChange={e => {getExamples(); getExampleText(parseInt(e.target.value));}}
 					className="dropdown-with-icons"
 					aria-labelledby="navbarDropdownMenuLink"
 				>

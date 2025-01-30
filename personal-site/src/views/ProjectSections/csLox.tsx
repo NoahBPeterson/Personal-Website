@@ -16,7 +16,6 @@
 
 */
 import React from "react";
-import classnames from "classnames";
 // reactstrap components
 import {
 	TabContent,
@@ -49,9 +48,7 @@ export default function CsLox() {
 							<Nav className="nav-tabs-info" role="tablist" tabs>
 								<NavItem>
 									<NavLink
-										className={classnames({
-										active: textTabs === 4,
-										})}
+										className={`${textTabs === 4 ? 'active' : ''}`}
 										onClick={(e) => setTextTabs(4)}
 										style={{cursor: "pointer"}}
 									>
@@ -60,9 +57,7 @@ export default function CsLox() {
 								</NavItem>
 								<NavItem>
 									<NavLink
-										className={classnames({
-										active: textTabs === 5,
-										})}
+										className={`${textTabs === 5 ? 'active' : ''}`}
 										onClick={(e) => setTextTabs(5)}
 										style={{cursor: "pointer"}}
 									>
@@ -71,9 +66,7 @@ export default function CsLox() {
 								</NavItem>
 								<NavItem>
 									<NavLink
-										className={classnames({
-										active: textTabs === 6,
-										})}
+										className={`${textTabs === 6 ? 'active' : ''}`}
 										style={{cursor: "pointer"}}
 										onClick={(e) => setTextTabs(6)}
 										>

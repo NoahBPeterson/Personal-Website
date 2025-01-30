@@ -1,24 +1,32 @@
-export default function BackgroundBubbles(props) {
+import React from "react";
+import path3 from "assets/img/path3.png";
+import path5 from "assets/img/path5.png";
+
+interface BackgroundBubblesProps {
+    value: number;
+}
+
+export default function BackgroundBubbles({ value }: BackgroundBubblesProps) {
     var bubblesChoice;
-    if(props.value === 0)
+    if(value === 0)
     {
         bubblesChoice = 
             <>
                 <img alt="..." className="path"
-                    src={require("assets/img/path5.png").default}
+                    src={path5}
                 />
                 <img alt="..." className="path path1"
-                    src={require("assets/img/path5.png").default}
+                    src={path5}
                 />
             </>;
-    }else if(props.value === 1)
+    }else if(value === 1)
     {
         bubblesChoice = 
         <>
             <img
                 alt="..."
                 className="path"
-                src={require("assets/img/path3.png").default}
+                src={path3}
             />
         </>;
     }

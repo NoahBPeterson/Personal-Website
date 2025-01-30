@@ -16,7 +16,6 @@
 
 */
 import React from "react";
-import classnames from "classnames";
 // reactstrap components
 import {
 	TabContent,
@@ -31,6 +30,7 @@ import {
 	NavItem,
 	NavLink,
 } from "reactstrap";
+import SpawnerTiersIcon from "assets/img/SpawnerTiersIcon.png";
 
 
 export default function SpawnerTiers() {
@@ -40,7 +40,7 @@ export default function SpawnerTiers() {
 		<Container>
 			<div className="title">
 				<h1 className="mb-3" >
-					<img src={require("assets/img/SpawnerTiersIcon.png").default} />
+					<img src={SpawnerTiersIcon} />
 					<i style={{fontSize: "1rem"}}>&nbsp;</i>
 					Tiered Spawners
 				</h1>
@@ -52,9 +52,7 @@ export default function SpawnerTiers() {
 							<Nav className="nav-tabs-info" role="tablist" tabs>
 								<NavItem>
 									<NavLink
-										className={classnames({
-										active: textTabs === 4,
-										})}
+										className={`${textTabs === 4 ? 'active' : ''}`}
 										onClick={(e) => setTextTabs(4)}
 										style={{cursor: "pointer"}}
 									>
@@ -63,9 +61,7 @@ export default function SpawnerTiers() {
 								</NavItem>
 								<NavItem>
 									<NavLink
-										className={classnames({
-										active: textTabs === 5,
-										})}
+										className={`${textTabs === 5 ? 'active' : ''}`}
 										onClick={(e) => setTextTabs(5)}
 										style={{cursor: "pointer"}}
 									>
@@ -109,7 +105,7 @@ export default function SpawnerTiers() {
 				</Col>
 				<Col className="ml-auto mr-auto" md="10" xl="6">
 					<iframe width="560" height="315" 
-						src="https://www.youtube.com/embed/lR_137aqd8U" frameborder="0"
+						src="https://www.youtube.com/embed/lR_137aqd8U"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 						allowFullScreen>
 					</iframe>

@@ -15,7 +15,6 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
 import {
@@ -56,8 +55,7 @@ export default function Footer() {
               </NavItem>
             </Nav>
           </Col>
-          {/*
-          <Col md="3">
+          {/* <Col md="3">
             <Nav>
               <NavItem>
                 <NavLink href="https://creative-tim.com/blog?ref=blkdsr-footer">
@@ -70,8 +68,7 @@ export default function Footer() {
                 </NavLink>
               </NavItem>
             </Nav>
-          </Col>
-          */}
+          </Col>*/}
           <Col></Col>
           <Col md="3">
             <h1 className="title">Contact:</h1>
@@ -85,7 +82,7 @@ export default function Footer() {
               >
                 <i className="fab fa-linkedin" />
               </Button>
-              <UncontrolledTooltip delay={0} target="tooltip622135962">
+              <UncontrolledTooltip delay={0} target="tooltip622135962" transition={{ timeout: 0 }}>
                 Connect with me
               </UncontrolledTooltip>
               <Button
@@ -97,7 +94,7 @@ export default function Footer() {
               >
                 <i className="fab fa-github" />
               </Button>
-              <UncontrolledTooltip delay={0} target="tooltip230450801">
+              <UncontrolledTooltip delay={0} target="tooltip230450801" transition={{ timeout: 0 }}>
                 Check out my code
               </UncontrolledTooltip>
             </div>
