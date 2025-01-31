@@ -1,0 +1,227 @@
+.syntax-highlighter-container {
+  position: relative;
+  height: 20rem;
+  background: #1a1a1a;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.syntax-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-sizing: border-box;
+  padding: 0.625rem;
+  text-align: left;
+}
+
+.syntax-overlay::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+.code-block {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: 'Berkeley Mono', monospace;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #e5e5e5;
+  box-sizing: border-box;
+  tab-size: 4;
+  min-height: calc(100% - 1.25rem); /* Account for padding */
+  text-align: left;
+}
+
+.code-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0.625rem;
+  background: transparent;
+  font-family: 'Berkeley Mono', monospace;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: transparent;
+  caret-color: white;
+  border: none;
+  outline: none;
+  resize: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: scroll;
+  box-sizing: border-box;
+  tab-size: 4;
+  text-align: left;
+  font-feature-settings: 'ss01' on, 'ss02' on, 'ss03' on, 'ss04' on, 'ss05' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.code-token {
+  font-feature-settings: 'ss01' on, 'ss02' on, 'ss03' on, 'ss04' on, 'ss05' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.code-token.keyword {
+  color: var(--token-keyword, #c792ea);
+}
+
+/* Special color for branching keywords */
+.code-token.keyword.branch,
+.code-token.operator.ternary {
+  color: var(--token-branch, #ffa657);  /* Warm orange color */
+  font-weight: 500;
+}
+
+.code-token.string {
+  color: var(--token-string, #89ca78);
+}
+
+.code-token.string-unterminated {
+  color: var(--token-string-unterminated, #e06c75);
+  text-decoration: wavy underline #e06c75;
+}
+
+.code-token.number {
+  color: var(--token-number, #f78c6c);
+}
+
+.code-token.boolean {
+  color: var(--token-boolean, #ff9cac);
+}
+
+.code-token.nil {
+  color: var(--token-nil, #7982a9);
+}
+
+.code-token.identifier {
+  color: var(--token-identifier, #d4d4d4);
+}
+
+.code-token.function {
+  color: var(--token-function, #dcdcaa);
+}
+
+.code-token.class {
+  color: var(--token-class, #e5c07b);
+}
+
+.code-token.operator {
+  color: var(--token-operator, #e6b450);
+  font-weight: 500;
+}
+
+.code-token.operator.increment-decrement {
+  color: var(--token-operator, #e6b450);
+  font-weight: bold;
+}
+
+.code-token.operator.null-related {
+  color: var(--token-null-operator, #c586c0);  /* Keep the pink for null operators */
+  font-weight: bold;
+}
+
+.code-token.operator.ternary {
+  color: var(--token-keyword, #c792ea);  /* Same purple as keywords */
+  font-weight: bold;
+}
+
+.code-token.punctuation {
+  color: var(--token-punctuation, #89ddff);
+}
+
+.code-token.punctuation.paren,
+.code-token.punctuation.brace {
+  color: var(--token-punctuation, #89ddff);
+  font-weight: 500;
+}
+
+.code-token.punctuation.delimiter {
+  color: var(--token-punctuation, #89ddff);
+  opacity: 0.8;
+}
+
+/* Comment styles */
+.code-token[data-type="COMMENT"] {
+  color: var(--token-comment, #676e95);
+  font-style: italic;
+  display: inline-block;
+  width: 100%;
+}
+
+.code-token.this {
+  color: var(--token-this, #ff9cac);
+}
+
+.code-token.super {
+  color: var(--token-super, #ff9cac);
+}
+
+.code-token.default {
+  color: var(--token-default, #bbbbbb);
+}
+
+.code-token.expression-start {
+  color: #d4d4d4;
+  font-weight: 500;
+}
+
+.code-token.expression-end {
+  color: #d4d4d4;
+  font-weight: 500;
+}
+
+/* New overlay styles */
+.relative {
+  position: relative;
+}
+
+pre.code-block {
+  pointer-events: none;
+  margin: 0;
+  z-index: 1;
+}
+
+textarea.code-block {
+  background: transparent !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* Variable styles */
+.code-token.variable-declaration {
+  color: var(--token-variable-declaration, #4ec9b0);  /* Teal color */
+  font-weight: 500;
+}
+
+.code-token.variable-reference {
+  color: var(--token-variable-reference, #9cdcfe);  /* Light blue */
+}
+
+/* Function styles */
+.code-token.function-declaration {
+  color: var(--token-function, #dcdcaa);  /* Warm yellow */
+  font-weight: 500;
+}
+
+.code-token.function-call {
+  color: var(--token-function, #dcdcaa);  /* Warm yellow */
+}

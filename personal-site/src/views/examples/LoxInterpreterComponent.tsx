@@ -17,6 +17,7 @@
 */
 import React, { useState } from "react";
 import {Button, Card, CardBody, Row, Col } from "reactstrap";
+import SyntaxHighlighter from '../../components/SyntaxHighlighter/SyntaxHighlighter';
 
 export default function LoxInterpreterComponent() {
 	const [programText, setProgramText] = useState('print "Hello, world!";');
@@ -85,48 +86,10 @@ export default function LoxInterpreterComponent() {
 	<>
 		<Card>
 			<CardBody>
-				<textarea 
-					className="form-control-plaintext font-mono"
-					style={{
-						fontFamily: "Berkeley Mono",
-						height: '10rem', 
-						WebkitFilter: "brightness(1000%)", 
-						border: "0.0625rem solid", 
-						padding: "0.625rem", 
-						fontSize: "1.1rem", 
-						lineHeight: "1.5",
-						zIndex: 900,
-						letterSpacing: "-0.01em",
-						fontFeatureSettings: "'ss01' on, 'ss02' on, 'ss03' on, 'ss04' on, 'ss05' on",
-						WebkitFontSmoothing: "antialiased",
-						MozOsxFontSmoothing: "grayscale"
-					}}
-					id="input" 
-					rows={10} cols={60}
-					value={programText}
-					maxLength={10000}
-					onChange={(event) => setProgramText(event.target.value)} />
-			</CardBody>
-			<CardBody style={{borderColor: "#8c3db9"}}>
-				<textarea 
-					className="form-control font-mono"
-					style={{
-						borderColor: "#8c3db9", 
-						WebkitFilter: "brightness(1000%)", 
-						border: "0.0625rem solid", 
-						padding: "0.625rem", 
-						fontSize: "1.1rem", 
-						lineHeight: "1.5",
-						zIndex: 900,
-						letterSpacing: "-0.01em",
-						fontFeatureSettings: "'ss01' on, 'ss02' on, 'ss03' on, 'ss04' on, 'ss05' on",
-						WebkitFontSmoothing: "antialiased",
-						MozOsxFontSmoothing: "grayscale"
-					}}
-					id="output"
-					rows={3} cols={50}
-					onChange={() => {}}
-					value={programResult}/>
+				<SyntaxHighlighter 
+					sourceCode={programText} 
+					onChange={setProgramText}
+				/>
 			</CardBody>
 		</Card>
 		<Row>
