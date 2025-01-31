@@ -44,6 +44,7 @@ export default {
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
+        mono: ['Berkeley Mono', 'monospace'],
       },
       opacity: {
         '15': '.15',

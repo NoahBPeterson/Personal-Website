@@ -44,7 +44,7 @@ export default function Footer() {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink to="/projects" tag={Link}>
+                <NavLink to="/" tag={Link}>
                   Projects
                 </NavLink>
               </NavItem>

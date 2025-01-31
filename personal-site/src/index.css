@@ -1,3 +1,13 @@
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('/fonts/BerkeleyMono-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+  font-size: 4rem;
+  letterSpacing: "-0.01em",
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,6 +15,10 @@
 @layer base {
   body {
     @apply bg-[#1f2251] text-white font-poppins;
+  }
+
+  code, pre, textarea {
+    @apply font-mono;
   }
 }
 
@@ -43,5 +57,9 @@
 
   .nav-tabs .nav-item .nav-link.active {
     @apply text-white border-b-2 border-primary;
+  }
+
+  .code-font {
+    @apply font-mono tracking-tight;
   }
 }

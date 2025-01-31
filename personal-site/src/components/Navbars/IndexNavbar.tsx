@@ -31,7 +31,11 @@ import {
   Col,
 } from "reactstrap";
 
-export default function IndexNavbar() {
+interface IndexNavbarProps {
+  activeSection: string;
+}
+
+export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
   const [collapseOpen, setCollapseOpen] = React.useState(false);
   const [collapseOut, setCollapseOut] = React.useState("");
   const [color, setColor] = React.useState("navbar-transparent");
@@ -64,11 +68,23 @@ export default function IndexNavbar() {
     setCollapseOut("");
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+      setCollapseOpen(false);
+    }
+  };
+
   return (
     <Navbar className={`fixed-top ${color} backdrop-blur-sm transition-colors duration-200`} expand="lg">
       <Container>
         <div className="navbar-translate">
-          <NavbarBrand to="/" tag={Link} id="navbar-brand">
+          <NavbarBrand 
+            href="#home"
+            onClick={(e) => { e.preventDefault(); scrollToSection("home"); }}
+            className="cursor-pointer"
+          >
             <img src="icon.png" className="invert" alt="Logo" />
           </NavbarBrand>
           <button
@@ -131,20 +147,18 @@ export default function IndexNavbar() {
             </NavItem>
             <NavItem>
               <Button
-                className="nav-link d-lg-block"
+                className={`nav-link d-lg-block ${activeSection === 'interpreter' ? 'active' : ''}`}
                 color="primary"
-                tag={Link}
-                to="/loxInterpreter"
+                onClick={() => scrollToSection("interpreter")}
               >
                 <i className="tim-icons icon-spaceship" /> Lox Interpreter
               </Button>
             </NavItem>
             <NavItem>
               <Button
-                className="nav-link d-lg-block"
+                className={`nav-link d-lg-block ${activeSection === 'projects' ? 'active' : ''}`}
                 color="default"
-                tag={Link}
-                to="/projects"
+                onClick={() => scrollToSection("projects")}
               >
                 <i className="fas fa-cubes" /> Projects
               </Button>

@@ -24,25 +24,20 @@ import "assets/scss/blk-design-system-react.scss?v=1.2.0";
 import "assets/demo/demo.css";
 import "./index.css";
 
-import Index from "./views/Index";
+import App from "./App";
 import LoxInterpreter from "./views/examples/LoxInterpreter";
-import Projects from "./views/Projects";
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element not found');
 const root = createRoot(container);
 root.render(
   <BrowserRouter>
-  	<Routes>
-	  	<Route path="/" element={<Index /> } />
-		<Route
-			path="/loxInterpreter"
-			element={<LoxInterpreter /> }
-		/>
-		<Route
-			path="/projects"
-			element={<Projects /> }
-		/>
-	</Routes>
+    <Routes>
+      <Route path="/" element={<App /> } />
+      <Route
+        path="/loxInterpreter"
+        element={<LoxInterpreter /> }
+      />
+    </Routes>
   </BrowserRouter>
 );

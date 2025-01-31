@@ -37,7 +37,7 @@ export default function CsLox() {
 	const [textTabs, setTextTabs] = React.useState(4);
 	return (
 	<div className="section section-tabs">
-		<Container>
+		<Container id="interpreter">
 			<div className="title">
 				<h1 className="mb-3">csLox</h1>
 			</div>
