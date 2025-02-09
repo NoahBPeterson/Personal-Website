@@ -92,22 +92,82 @@ export default function LoxInterpreterComponent() {
 				/>
 			</CardBody>
 		</Card>
+		<Card className="mt-3">
+			<CardBody>
+				<textarea 
+					className="form-control font-mono"
+					style={{
+						borderColor: "#8c3db9", 
+						WebkitFilter: "brightness(1000%)", 
+						border: "0.0625rem solid", 
+						padding: "0.625rem", 
+						fontSize: "1.1rem", 
+						lineHeight: "1.5",
+						height: "15rem",
+						zIndex: 900,
+						letterSpacing: "-0.01em",
+						fontFeatureSettings: "'ss01' on, 'ss02' on, 'ss03' on, 'ss04' on, 'ss05' on",
+						WebkitFontSmoothing: "antialiased",
+						MozOsxFontSmoothing: "grayscale",
+						background: "transparent",
+						color: "#e5e5e5"
+					}}
+					id="output"
+					readOnly
+					value={programResult}
+				/>
+			</CardBody>
+		</Card>
 		<Row>
 			<Col>
 				<Button className="btn-round" color="primary" size="lg" onClick={() => runProgram()}>
 					Run
 				</Button>
 			</Col>
-			<Col style={{top: "1rem"}}>
+			<Col md="6" className="d-flex justify-content-end">
 				<select  
 					name="options"
 					onClick={() => getExamples()}
 					onChange={e => {getExamples(); getExampleText(parseInt(e.target.value));}}
-					className="dropdown-with-icons"
+					className="form-control font-mono"
+					style={{
+						background: "#1a1a1a",
+						color: "#e5e5e5",
+						borderColor: "#8c3db9",
+						border: "0.0625rem solid",
+						padding: "0.75rem 1rem",
+						fontSize: "1.1rem",
+						cursor: "pointer",
+						WebkitFontSmoothing: "antialiased",
+						MozOsxFontSmoothing: "grayscale",
+						fontFeatureSettings: "'ss01' on, 'ss02' on, 'ss03' on, 'ss04' on, 'ss05' on",
+						height: "3.5rem",
+						display: "flex",
+						alignItems: "center",
+						width: "auto",
+						minWidth: "200px"
+					}}
 					aria-labelledby="navbarDropdownMenuLink"
 				>
-					<option value={-1} key={-1}>Example Programs</option>
-					{programExamples}
+					<option value={-1} key={-1} style={{ 
+						background: "#1a1a1a", 
+						color: "#e5e5e5",
+						padding: "0.75rem 1rem",
+						height: "3rem",
+						display: "flex",
+						alignItems: "center"
+					}}>Example Programs</option>
+					{programExamples.map(option => React.cloneElement(option, {
+						style: { 
+							background: "#1a1a1a", 
+							color: "#e5e5e5", 
+							cursor: "pointer",
+							padding: "0.75rem 1rem",
+							height: "3rem",
+							display: "flex",
+							alignItems: "center"
+						}
+					}))}
 				</select>
 			</Col>
 		</Row>	

@@ -1,10 +1,11 @@
 {
-  "name": "NoahPeterson-PersonalWebsite",
+  "name": "NoahPeterson_PersonalWebsite",
   "version": "1.0.0",
   "description": "Portfolio website for Noah Peterson",
   "main": "index.js",
   "author": "Noah Peterson",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "13.1.1",

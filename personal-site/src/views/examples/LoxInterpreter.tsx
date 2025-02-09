@@ -69,7 +69,7 @@ export default function LoxInterpreter() {
 						<h1 className="mb-3">csLox</h1>
 					</div>
 					<Row>
-						<Col className="ml-auto mr-auto" md="10" xl="6">
+						<Col className="ml-auto mr-auto" md="12" xl="4">
 							<Card>
 								<CardHeader>
 									<CardTitle tag="h4">Language Details</CardTitle>
@@ -88,7 +88,7 @@ export default function LoxInterpreter() {
 								</CardBody>
 							</Card>
 						</Col>
-						<Col className="ml-auto mr-auto" md="10" xl="6">
+						<Col className="ml-auto mr-auto" md="12" xl="8">
 							<LoxInterpreterComponent />
 						</Col>
 					</Row>
