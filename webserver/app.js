@@ -1,117 +1,125 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cors = require('cors');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-const fs = require("fs");
-const { exec	} = require("child_process");
+import { Elysia } from 'elysia';
+import { cors } from '@elysiajs/cors';
+import { staticPlugin } from '@elysiajs/static';
+import { exec } from 'child_process';
+import { writeFileSync } from 'fs';
+import { readdir, readFile, writeFile, unlink, mkdir } from 'fs/promises';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
+let counter = 0;
+let exampleFiles = [];
 
-var indexRouter = require('./routes/index');
-const { response } = require('express');
+// Create directories if they don't exist
+const ensureDirectories = async () => {
+	const dirs = ['./LoxPrograms', './LoxExamplePrograms'];
+	for (const dir of dirs) {
+		if (!existsSync(dir)) {
+			try {
+				await mkdir(dir);
+				console.log(`Created directory: ${dir}`);
+			} catch (err) {
+				console.error(`Error creating directory ${dir}:`, err);
+			}
+		}
+	}
+};
 
-var app = express();
-var corsOptions = {origin:true}
-app.use(cors(corsOptions));
-app.disable('etag');
+// Ensure directories exist before starting
+await ensureDirectories();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
-
-var counter = 0;
-var exampleFiles = [];
-fs.readdir('./LoxPrograms', (err, files) => {
+// Initialize counter and example files
+try {
+	const files = await readdir('./LoxPrograms');
 	counter = files.length;
-});
+	
+} catch (err) {
+	console.error('Error reading LoxPrograms:', err);
+}
 
-fs.readdir('./LoxExamplePrograms', (err, files) => {
-	exampleFiles = files;
-})
+try {
+	exampleFiles = await readdir('./LoxExamplePrograms');
+} catch (err) {
+	console.error('Error reading LoxExamplePrograms:', err);
+}
 
-app.get('/loxExamples', cors(), function(req, res) {
-	res.header('Access-Control-Allow-Origin', '*');
-	if(exampleFiles != null)
-	{
-		var filesModified = [];
-		for(var i = 0; i < exampleFiles.length; i++)
-		{
-			var change = exampleFiles[i].replace(/_/g, " ");
-			change = change.replace(/(\.lox)/g, "")
-			filesModified.push(change);
+const app = new Elysia()
+	.use(cors())
+	.use(staticPlugin({
+		prefix: '/',
+		assets: 'public'
+	}))
+	.get('/loxExamples', () => {
+		if (exampleFiles?.length) {
+			return exampleFiles.map(file => 
+				file.replace(/_/g, ' ').replace(/(\.lox)/g, '')
+			);
 		}
-		res.send(filesModified).json();	
-	}else {
-		res.send("");
-	}
-});
-
-app.post('/loxExamples/:exampleProgram', cors(), function(req, res) {
-	res.header('Access-Control-Allow-Origin', '*');
-	const exampleProgram = parseInt(req.params.exampleProgram);
-
-	fs.readFile('./LoxExamplePrograms/'+exampleFiles[exampleProgram], 'utf8' , (err, data) => {
-		if (err) {
-			res.json(err);
-			return;
+		return [];
+	})
+	.post('/loxExamples/:exampleProgram', async ({ params }) => {
+		const exampleProgram = parseInt(params.exampleProgram);
+		
+		try {
+			const data = await readFile(
+				join('./LoxExamplePrograms', exampleFiles[exampleProgram]), 
+				'utf8'
+			);
+			return data;
+		} catch (err) {
+			return { error: err.message };
 		}
-		res.json(data);
-	});
-});
+	})
+	.post('/loxOutput', async ({ body }) => {
+		if (!body || typeof body.text !== 'string') {
+			return { error: 'Invalid input' };
+		}
 
+		if (body.text.length > 10000) {
+			return 'Cannot send more than 10k characters.';
+		}
 
+		const threadSafeCounter = counter++;
+		const location = './LoxPrograms/lox' + threadSafeCounter + '.lox';
+		const execute = 'dotnet Lox.dll ' + location + ' timeout=5';
 
-app.post('/loxOutput', cors(), function(req, res) {
-	res.header('Access-Control-Allow-Origin', '*');
+		try {
+			//await writeFile(location, body.text);
+			writeFileSync(location, body.text);
+			console.log("wrote file", location, body.text);
+			console.log("executing command:", execute);
+			
+			return new Promise((resolve) => {
+				exec(execute, { cwd: process.cwd() }, (err, stdout, stderr) => {
+					console.log("exec error:", err);
+					console.log("exec stderr:", stderr);
+					console.log("exec stdout:", stdout);
+					
+					if (err) {
+						console.error("Execution error:", err);
+						resolve({ error: err.message });
+						return;
+					}
+					
+					const output = stdout.toString();
+					console.log("output:", output);
+					
+					unlink(location).catch(err => 
+						console.error('Error deleting file:', err)
+					);
+					
+					resolve(output || stderr.toString() || 'No output');
+				});
+			});
+		} catch (error) {
+			console.error("Caught error:", error);
+			return { error: error.message };
+		}
+	})
+	.listen(process.env.PORT || 5001);
 
-	if(req.body.text.length > 10000)
-	{
-		res.json("Cannot send more than 10k characters.");
-		return;
-	}
+console.log(
+	`🦊 Server is running at ${app.server?.hostname}:${app.server?.port}`
+);
 
-	var threadSafeCounter = counter++;
-	var location = './LoxPrograms/lox'+threadSafeCounter+'.lox';
-	var execute = 'dotnet Lox.dll '+location+' timeout=5';
-
-	fs.writeFileSync(location, req.body.text, err => {
-		if(err) throw err;
-	});
-
-	exec(execute, function(err, data, stderr) {
-		if(err) {
-			res.json(data.toString());
-		} else 
-			res.json(data.toString());
-			fs.unlink(location, (err) => {
-				if(err) throw err;
-			})											 
-	});
-});
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-	next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-	// set locals, only providing error in development
-	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-	// render the error page
-	res.status(err.status || 500);
-	res.render('error');
-});
-
-module.exports = app;
+export { app };

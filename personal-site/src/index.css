@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'BerkeleyMono';
-  src: url('/fonts/BerkeleyMono-Bold.woff2') format('woff2');
+  src: url('./assets/fonts/BerkeleyMono-Bold.woff2') format('woff2');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
   font-size: 4rem;
-  letterSpacing: "-0.01em",
+  letter-spacing: -0.01em;
 }
 
 @tailwind base;

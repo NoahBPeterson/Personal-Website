@@ -1,3 +1,4 @@
+@use 'sass:color';
 .nav-pills {
 
   &.flex-column li > a {
@@ -39,7 +40,7 @@
 
 
             &:hover{
-                background-color: darken($card-black-background,5%);
+                background-color: color.adjust($card-black-background, $lightness: -5%);
             }
 
             &.active{

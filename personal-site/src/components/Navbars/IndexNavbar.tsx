@@ -16,7 +16,7 @@
 
 */
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 // reactstrap components
 import {
   Button,
@@ -36,6 +36,7 @@ interface IndexNavbarProps {
 }
 
 export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
+  const location = useLocation();
   const [collapseOpen, setCollapseOpen] = React.useState(false);
   const [collapseOut, setCollapseOut] = React.useState("");
   const [color, setColor] = React.useState("navbar-transparent");
@@ -76,16 +77,25 @@ export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
     }
   };
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname === '/loxInterpreter') {
+      window.location.href = '/';
+    } else {
+      scrollToSection("home");
+    }
+  };
+
   return (
     <Navbar className={`fixed-top ${color} backdrop-blur-sm transition-colors duration-200`} expand="lg">
       <Container>
         <div className="navbar-translate">
           <NavbarBrand 
-            href="#home"
-            onClick={(e) => { e.preventDefault(); scrollToSection("home"); }}
+            href="/"
+            onClick={handleLogoClick}
             className="cursor-pointer"
           >
-            <img src="icon.png" className="invert"style={{ filter: 'invert(1)' }}alt="Logo" />
+            <img src="icon.png" className="invert" style={{ filter: 'invert(1)' }} alt="Logo" />
           </NavbarBrand>
           <button
             aria-expanded={collapseOpen}

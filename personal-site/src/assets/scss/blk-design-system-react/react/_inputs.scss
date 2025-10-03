@@ -1,3 +1,4 @@
+@use 'sass:color';
 .form-control:focus,
 .form-control:focus + .input-group-append .input-group-text,
 .form-control:focus ~ .input-group-append .input-group-text,
@@ -8,5 +9,5 @@
   border-color: $info;
 }
 .has-danger .form-control:focus {
-  border-color: lighten($danger-states,5%);
+  border-color: color.adjust($danger-states, $lightness: 5%);
 }

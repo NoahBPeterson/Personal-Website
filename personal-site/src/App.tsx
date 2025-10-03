@@ -85,9 +85,9 @@ export default function App() {
           <section id="projects" className="section section-javascript">
             <BackgroundBubbles value={0} />
             <CsLox />
-            <BlockTrack />
             <div className="section section-navbars">
               <BackgroundBubbles value={1} />
+              <BlockTrack />
               <SpawnerTiers />
             </div>
           </section>

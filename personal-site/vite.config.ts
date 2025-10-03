@@ -19,8 +19,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `$asset-base-path: "/assets";`,
-        includePaths: ['node_modules', 'src/assets/scss']
+        includePaths: ['node_modules', 'src/assets/scss'],
+        quietDeps: true
       }
     }
   }

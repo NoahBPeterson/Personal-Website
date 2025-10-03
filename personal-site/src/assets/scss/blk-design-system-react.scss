@@ -16,7 +16,8 @@
 
 */
 
-$asset-base-path: '../../../../assets' !default;
+// Use relative paths so Vite can process and rewrite URLs at build time
+$asset-base-path: '../assets' !default;
 
 // Core
 

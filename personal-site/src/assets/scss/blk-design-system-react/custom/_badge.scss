@@ -1,3 +1,4 @@
+@use 'sass:color';
 /*           badges             */
 .badge{
     text-transform: uppercase;
@@ -21,5 +22,5 @@
 }
 
 .badge-success{
-    @include badge-variant(darken($success,10%));
+    @include badge-variant(color.adjust($success, $lightness: -10%));
 }

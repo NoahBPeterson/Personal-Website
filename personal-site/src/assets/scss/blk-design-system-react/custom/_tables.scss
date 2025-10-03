@@ -1,3 +1,4 @@
+@use 'sass:color';
 .table{
   > tbody > tr > td {
     color: rgba(255, 255, 255, 0.7) !important;
@@ -16,7 +17,7 @@
   }
 
   > tbody > tr.table-success > td{
-    background-color: darken($success,10%);
+    background-color: color.adjust($success, $lightness: -10%);
   }
 
   > tbody > tr.table-info > td{
