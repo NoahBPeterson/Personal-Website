@@ -283,8 +283,8 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
         lsp.onRequest('workspace/workspaceFolders', () => null);
         lsp.onRequest('window/workDoneProgress/create', () => null);
 
-        // Log/server messages
-        lsp.onNotification('window/logMessage', (p) => console.log('[ucode-lsp]', p));
+        // Suppress server log messages
+        lsp.onNotification('window/logMessage', () => {});
 
 		model.onDidChangeContent(() => {
 			version += 1;
@@ -334,7 +334,6 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 					context: { diagnostics: relevantDiagnostics },
 				};
 				const result = await lsp.sendRequest('textDocument/codeAction', params);
-				console.log('[ucode-lsp] codeAction response:', JSON.stringify(result, null, 2));
 				if (!result || !Array.isArray(result)) return { actions: [], dispose: () => {} };
 				const actions: monaco.languages.CodeAction[] = result.map((action: any) => {
 					const edits: monaco.languages.WorkspaceTextEdit[] = [];
