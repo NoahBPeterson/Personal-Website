@@ -21,40 +21,17 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - name: Deploy to Lightsail
+      - name: Ensure runtime dependencies
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USER }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            # Install Bun if not present
-            if ! command -v bun &> /dev/null; then
-              curl -fsSL https://bun.sh/install | bash
-              echo 'export BUN_INSTALL="$HOME/.bun"' >> ~/.bashrc
-              echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> ~/.bashrc
-            fi
             export BUN_INSTALL="$HOME/.bun"
             export PATH="$BUN_INSTALL/bin:$PATH"
-
-            # Install Node.js if not present
-            if ! command -v node &> /dev/null; then
-              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
-              sudo apt-get install -y nodejs
-            fi
-
-            # Install ucode-lsp globally if not present
-            if ! command -v ucode-lsp &> /dev/null; then
-              sudo npm install -g ucode-lsp
-            fi
-
-            # Install .NET 6.0 if not present
-            if ! command -v dotnet &> /dev/null; then
-              curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh
-              chmod +x /tmp/dotnet-install.sh
-              /tmp/dotnet-install.sh --channel 6.0 --runtime dotnet --install-dir /usr/share/dotnet
-              sudo ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
-            fi
+            command -v bun || curl -fsSL https://bun.sh/install | bash
+            command -v ucode-lsp || sudo npm install -g ucode-lsp
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
@@ -66,7 +43,18 @@ jobs:
           target: "~/app"
           overwrite: true
 
-      - name: Install dependencies and restart services
+      - name: Create systemd service file
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USER }}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          script: |
+            printf '%s\n' '[Unit]' 'Description=Personal Website Backend' 'After=network.target' '' '[Service]' 'Type=simple' 'User=ubuntu' 'WorkingDirectory=/home/ubuntu/app/webserver' 'Environment=BUN_INSTALL=/home/ubuntu/.bun' 'Environment=PATH=/home/ubuntu/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' 'ExecStart=/home/ubuntu/.bun/bin/bun run app.js' 'Restart=always' 'RestartSec=5' '' '[Install]' 'WantedBy=multi-user.target' | sudo tee /etc/systemd/system/personal-website.service > /dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl enable personal-website
+
+      - name: Install deps and restart
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
@@ -75,41 +63,10 @@ jobs:
           script: |
             export BUN_INSTALL="$HOME/.bun"
             export PATH="$BUN_INSTALL/bin:$PATH"
-
-            # Install webserver dependencies
             cd ~/app/webserver
             bun install --frozen-lockfile
-
-            # Copy frontend build to nginx
             sudo rm -rf /var/www/html/*
             sudo cp -r ~/app/personal-site/build/* /var/www/html/
-
-            # Set up systemd services if not already configured
-            if [ ! -f /etc/systemd/system/personal-website.service ]; then
-              sudo tee /etc/systemd/system/personal-website.service > /dev/null << 'UNIT'
-            [Unit]
-            Description=Personal Website Backend
-            After=network.target
-
-            [Service]
-            Type=simple
-            User=ubuntu
-            WorkingDirectory=/home/ubuntu/app/webserver
-            Environment=BUN_INSTALL=/home/ubuntu/.bun
-            Environment=PATH=/home/ubuntu/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-            ExecStart=/home/ubuntu/.bun/bin/bun run app.js
-            Restart=always
-            RestartSec=5
-
-            [Install]
-            WantedBy=multi-user.target
-            UNIT
-              sudo systemctl daemon-reload
-              sudo systemctl enable personal-website
-            fi
-
-            # Restart the backend
             sudo systemctl restart personal-website
-
-            # Reload nginx
             sudo systemctl reload nginx
+            echo "Deploy complete"
