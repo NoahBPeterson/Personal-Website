@@ -231,6 +231,15 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 			automaticLayout: true,
 			minimap: { enabled: false },
 			fixedOverflowWidgets: true,
+			wordWrap: "on",
+			scrollbar: {
+				vertical: "hidden",
+				horizontal: "hidden",
+			},
+			overviewRulerLanes: 0,
+			hideCursorInOverviewRuler: true,
+			overviewRulerBorder: false,
+			scrollBeyondLastLine: false,
 		});
 		editorRef.current = editor;
 
