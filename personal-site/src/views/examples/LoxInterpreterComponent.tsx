@@ -22,7 +22,10 @@ import SyntaxHighlighter from '../../components/SyntaxHighlighter/SyntaxHighligh
 function apiBase(): string {
 	const hostname = window.location.hostname || "localhost";
 	const protocol = window.location.protocol;
-	return `${protocol}//${hostname}:5001`;
+	if (window.location.port === "5173") {
+		return `${protocol}//${hostname}:5001`;
+	}
+	return `${protocol}//${hostname}`;
 }
 
 export default function LoxInterpreterComponent() {

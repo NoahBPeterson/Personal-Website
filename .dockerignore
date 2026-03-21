@@ -1,0 +1,7 @@
+node_modules
+personal-site/node_modules
+personal-site/build
+webserver/node_modules
+webserver/LoxPrograms
+.git
+checklist.md

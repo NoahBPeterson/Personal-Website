@@ -83,7 +83,12 @@ class LspConnection {
 function createUrl(): string {
 	const hostname = window.location.hostname || "localhost";
 	const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-	return `${protocol}://${hostname}:6005`;
+	// In dev (Vite on 5173), connect directly to the LSP bridge port
+	// In production (served by nginx on 80/443), use the /lsp proxy path
+	if (window.location.port === "5173") {
+		return `${protocol}://${hostname}:6005`;
+	}
+	return `${protocol}://${hostname}/lsp`;
 }
 
 // Map TextMate scopes to Monaco token types for vs-dark theme
