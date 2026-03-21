@@ -109,7 +109,7 @@ const app = new Elysia()
 
 		const threadSafeCounter = counter++;
 		const location = './LoxPrograms/lox' + threadSafeCounter + '.lox';
-		const execute = '/usr/bin/dotnet Lox.dll ' + location + ' timeout=5';
+		const execute = '/usr/lib/dotnet/dotnet Lox.dll ' + location + ' timeout=5';
 
 		try {
 			//await writeFile(location, body.text);
