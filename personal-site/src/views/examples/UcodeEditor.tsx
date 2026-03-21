@@ -85,7 +85,7 @@ function createUrl(): string {
 	const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 	// In dev (Vite on 5173), connect directly to the LSP bridge port
 	// In production (served by nginx on 80/443), use the /lsp proxy path
-	if (window.location.port === "5173") {
+	if (window.location.port !== "" && window.location.port !== "80" && window.location.port !== "443") {
 		return `${protocol}://${hostname}:6005`;
 	}
 	return `${protocol}://${hostname}/lsp`;

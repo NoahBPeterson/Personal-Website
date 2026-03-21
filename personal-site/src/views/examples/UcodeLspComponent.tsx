@@ -5,14 +5,14 @@ import UcodeEditor from "./UcodeEditor";
 function apiBase(): string {
 	const hostname = window.location.hostname || "localhost";
 	const protocol = window.location.protocol;
-	if (window.location.port === "5173") {
+	if (window.location.port !== "" && window.location.port !== "80" && window.location.port !== "443") {
 		return `${protocol}//${hostname}:5001`;
 	}
 	return `${protocol}//${hostname}`;
 }
 
 export default function UcodeLspComponent() {
-	const [programText, setProgramText] = React.useState('import { create } from "socket";\nprint("Hello ucode");');
+	const [programText, setProgramText] = React.useState('// Try hovering over functions to see types!\nlet double = x => x * 2;\nlet nums = [1, 2, 3, 4, 5];\n\nlet doubled = map(nums, double);\nlet evens = filter(nums, x => x % 2 == 0);\n\nprintf("Doubled: %s\\n", join(", ", map(doubled, x => "" + x)));\nprintf("Evens: %s\\n", join(", ", map(evens, x => "" + x)));');
 	const [programExamples, setProgramExamples] = React.useState<JSX.Element[]>([]);
 	const fetchedRef = React.useRef(false);
 

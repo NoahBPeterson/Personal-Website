@@ -36,7 +36,7 @@ import UcodeLspComponent from "../examples/UcodeLspComponent";
 function apiBase(): string {
 	const hostname = window.location.hostname || "localhost";
 	const protocol = window.location.protocol;
-	if (window.location.port === "5173") {
+	if (window.location.port !== "" && window.location.port !== "80" && window.location.port !== "443") {
 		return `${protocol}//${hostname}:5001`;
 	}
 	return `${protocol}//${hostname}`;
@@ -44,7 +44,7 @@ function apiBase(): string {
 
 export default function UcodeLspSection() {
 	const [textTabs, setTextTabs] = React.useState(4);
-	const [programText, setProgramText] = React.useState('import { create } from \"socket\";\nprint(\"Hello ucode\");');
+	const [programText, setProgramText] = React.useState('// Try hovering over functions to see types!\nlet double = x => x * 2;\nlet nums = [1, 2, 3, 4, 5];\n\nlet doubled = map(nums, double);\nlet evens = filter(nums, x => x % 2 == 0);\n\nprintf(\"Doubled: %s\\n\", join(\", \", map(doubled, x => \"\" + x)));\nprintf(\"Evens: %s\\n\", join(\", \", map(evens, x => \"\" + x)));');
 	const [programExamples, setProgramExamples] = React.useState<JSX.Element[]>([]);
 	const [exampleText, setExampleText] = React.useState('');
 
@@ -133,29 +133,39 @@ export default function UcodeLspSection() {
 							<TabContent className="tab-space" activeTab={"link" + textTabs}>
 								<TabPane tabId="link4">
 									<p>
-										A TypeScript-based Language Server for the <code>ucode</code> scripting language with autocompletion, diagnostics, go-to definition, and basic type inference.
+										A full-featured Language Server for the <code>ucode</code> scripting language, built in TypeScript. Provides a VS Code-like editing experience with real-time diagnostics, intelligent completions, and type-aware code analysis.
 									</p>
 									<p>
-										Source repository:&nbsp;
+										Available as a{' '}
+										<a href="https://marketplace.visualstudio.com/items?itemName=noahbpeterson.ucode-lsp">
+											VS Code extension
+										</a>
+										{', '}
+										<a href="https://www.npmjs.com/package/ucode-lsp">
+											npm package
+										</a>
+										, and on{' '}
 										<a href="https://github.com/noahBPeterson/ucode-lsp">
 											<i className="fab fa-github">
 												<i style={{fontSize: "0.5rem"}}>&nbsp;</i>
-												NoahBPeterson/ucode-lsp
+												GitHub
 											</i>
 										</a>
 									</p>
 								</TabPane>
 								<TabPane tabId="link5">
 									<ul>
-										<li>Context-aware completions for builtins and modules</li>
-										<li>Diagnostics with precise ranges and basic type inference</li>
-										<li>Go to Definition and Hover information</li>
-										<li>Optimized with caching</li>
+										<li>Flow-sensitive type inference with union types and type narrowing</li>
+										<li>Context-aware completions for 15+ modules, builtins, and user code</li>
+										<li>Quick Fix code actions with type guard suggestions</li>
+										<li>Cross-file go-to-definition and hover with full type signatures</li>
+										<li>JSDoc annotation support with <code>@param</code> and <code>@returns</code></li>
+										<li>Control flow graph analysis for unreachable code detection</li>
 									</ul>
 								</TabPane>
 								<TabPane tabId="link6">
 									<p>
-										This website demo runs the real ucode LSP in the backend and connects over WebSocket.
+										This live demo runs the real ucode LSP server and connects via WebSocket. Try hovering over functions, triggering completions with <code>Ctrl+Space</code>, or clicking the lightbulb for Quick Fixes.
 									</p>
 								</TabPane>
 							</TabContent>

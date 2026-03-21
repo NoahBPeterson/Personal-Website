@@ -22,7 +22,7 @@ import SyntaxHighlighter from '../../components/SyntaxHighlighter/SyntaxHighligh
 function apiBase(): string {
 	const hostname = window.location.hostname || "localhost";
 	const protocol = window.location.protocol;
-	if (window.location.port === "5173") {
+	if (window.location.port !== "" && window.location.port !== "80" && window.location.port !== "443") {
 		return `${protocol}//${hostname}:5001`;
 	}
 	return `${protocol}//${hostname}`;
@@ -43,7 +43,11 @@ export default function LoxInterpreterComponent() {
 			}
 		});
 		const body = await result.json();
-		setProgramResult(body);
+		if (typeof body === 'object' && body.error) {
+			setProgramResult("Error");
+		} else {
+			setProgramResult(typeof body === 'string' ? body : JSON.stringify(body));
+		}
 	}
 	
 	const getExamples = async () => {
@@ -76,16 +80,8 @@ export default function LoxInterpreterComponent() {
 	const getExampleText = async (chosenExample: number) => {
 		const result = await fetch(`${apiBase()}/loxExamples/${chosenExample}`, {
 			method: 'post',
-			body: JSON.stringify(
-			{ 
-				string: exampleText,
-			}),
-			headers: {
-			'Content-Type': 'application/json',
-			'Accept': 'application/json',
-			}
 		});
-		const body = await result.json();
+		const body = await result.text();
 		setProgramText(body);
 	}
 

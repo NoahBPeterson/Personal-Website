@@ -26,7 +26,7 @@ import UcodeLspComponent from "./UcodeLspComponent";
 export default function UcodeLsp(): JSX.Element {
     const [squares1to6, setSquares1to6] = useState("");
     const [squares7and8, setSquares7and8] = useState("");
-    const [programText, setProgramText] = useState('import { create } from "socket";\nprint("Hello ucode");');
+    const [programText, setProgramText] = useState('// Try hovering over functions to see types!\nlet double = x => x * 2;\nlet nums = [1, 2, 3, 4, 5];\n\nlet doubled = map(nums, double);\nlet evens = filter(nums, x => x % 2 == 0);\n\nprintf("Doubled: %s\\n", join(", ", map(doubled, x => "" + x)));\nprintf("Evens: %s\\n", join(", ", map(evens, x => "" + x)));');
     const [programExamples, setProgramExamples] = useState<JSX.Element[]>([]);
     const [exampleText, setExampleText] = useState('');
 
