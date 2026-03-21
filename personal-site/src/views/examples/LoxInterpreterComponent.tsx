@@ -19,6 +19,12 @@ import React, { useState } from "react";
 import {Button, Card, CardBody, Row, Col } from "reactstrap";
 import SyntaxHighlighter from '../../components/SyntaxHighlighter/SyntaxHighlighter';
 
+function apiBase(): string {
+	const hostname = window.location.hostname || "localhost";
+	const protocol = window.location.protocol;
+	return `${protocol}//${hostname}:5001`;
+}
+
 export default function LoxInterpreterComponent() {
 	const [programText, setProgramText] = useState('print "Hello, world!";');
 	const [programResult, setProgramResult] = useState('');
@@ -26,7 +32,7 @@ export default function LoxInterpreterComponent() {
 	const [exampleText, setExampleText] = useState('');
 	
 	const runProgram = async () => {
-		const result = await fetch(`http://noahpeterson.me:5000/loxOutput`, {
+		const result = await fetch(`${apiBase()}/loxOutput`, {
 			method: 'post',
 			body: JSON.stringify({ text: programText }),
 			headers: {
@@ -39,7 +45,7 @@ export default function LoxInterpreterComponent() {
 	
 	const getExamples = async () => {
 		if(programExamples.length > 0) return;
-		const result = await fetch('http://noahpeterson.me:5000/loxExamples', {
+		const result = await fetch(`${apiBase()}/loxExamples`, {
 			method: 'get',
 			headers: {
 			'Content-Type': 'application/json',
@@ -65,7 +71,7 @@ export default function LoxInterpreterComponent() {
 	}
 
 	const getExampleText = async (chosenExample: number) => {
-		const result = await fetch('http://noahpeterson.me:5000/loxExamples/'+chosenExample, {
+		const result = await fetch(`${apiBase()}/loxExamples/${chosenExample}`, {
 			method: 'post',
 			body: JSON.stringify(
 			{ 

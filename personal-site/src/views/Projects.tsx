@@ -30,6 +30,7 @@ import BackgroundBubbles from "./ProjectSections/backgroundBubbles";
 import CsLox from "./ProjectSections/csLox";
 import BlockTrack from "./ProjectSections/blockTrack";
 import SpawnerTiers from "./ProjectSections/spawnerTiers";
+import UcodeLspSection from "./ProjectSections/ucodeLsp";
 
 
 export default function Project() {
@@ -42,7 +43,7 @@ export default function Project() {
   },[]);
   return (
     <>
-      <IndexNavbar />
+      <IndexNavbar activeSection="projects" />
         <div className="wrapper">
 			<div className="page-header header-filter">
 				<div className="squares square1" />
@@ -67,6 +68,7 @@ export default function Project() {
 				<div className="section section-navbars">
 					<BackgroundBubbles value={1}/>
 					<SpawnerTiers />
+					<UcodeLspSection />
 				</div>
 			</div>
 			<Footer />

@@ -11,6 +11,7 @@ import BackgroundBubbles from "./views/ProjectSections/backgroundBubbles";
 import CsLox from "./views/ProjectSections/csLox";
 import BlockTrack from "./views/ProjectSections/blockTrack";
 import SpawnerTiers from "./views/ProjectSections/spawnerTiers";
+import UcodeLspSection from "./views/ProjectSections/ucodeLsp";
 import LoxInterpreterComponent from "./views/examples/LoxInterpreterComponent";
 
 export default function App() {
@@ -89,6 +90,7 @@ export default function App() {
               <BackgroundBubbles value={1} />
               <BlockTrack />
               <SpawnerTiers />
+              <UcodeLspSection />
             </div>
           </section>
         </div>

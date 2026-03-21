@@ -26,6 +26,7 @@ import "./index.css";
 
 import App from "./App";
 import LoxInterpreter from "./views/examples/LoxInterpreter";
+import UcodeLsp from "./views/examples/UcodeLsp";
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element not found');
@@ -37,6 +38,10 @@ root.render(
       <Route
         path="/loxInterpreter"
         element={<LoxInterpreter /> }
+      />
+      <Route
+        path="/ucode"
+        element={<UcodeLsp /> }
       />
     </Routes>
   </BrowserRouter>

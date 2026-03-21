@@ -6,13 +6,15 @@ import { writeFileSync } from 'fs';
 import { readdir, readFile, writeFile, unlink, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { startUcodeLspBridge } from './lspBridge.js';
 
 let counter = 0;
 let exampleFiles = [];
+let ucodeExampleFiles = [];
 
 // Create directories if they don't exist
 const ensureDirectories = async () => {
-	const dirs = ['./LoxPrograms', './LoxExamplePrograms'];
+	const dirs = ['./LoxPrograms', './LoxExamplePrograms', './UcodeExamplePrograms'];
 	for (const dir of dirs) {
 		if (!existsSync(dir)) {
 			try {
@@ -43,6 +45,12 @@ try {
 	console.error('Error reading LoxExamplePrograms:', err);
 }
 
+try {
+	ucodeExampleFiles = await readdir('./UcodeExamplePrograms');
+} catch (err) {
+	console.error('Error reading UcodeExamplePrograms:', err);
+}
+
 const app = new Elysia()
 	.use(cors())
 	.use(staticPlugin({
@@ -63,6 +71,26 @@ const app = new Elysia()
 		try {
 			const data = await readFile(
 				join('./LoxExamplePrograms', exampleFiles[exampleProgram]), 
+				'utf8'
+			);
+			return data;
+		} catch (err) {
+			return { error: err.message };
+		}
+	})
+	.get('/ucodeExamples', () => {
+		if (ucodeExampleFiles?.length) {
+			return ucodeExampleFiles.map(file => 
+				file.replace(/_/g, ' ').replace(/(\.uc)/g, '')
+			);
+		}
+		return [];
+	})
+	.post('/ucodeExamples/:exampleProgram', async ({ params }) => {
+		const exampleProgram = parseInt(params.exampleProgram);
+		try {
+			const data = await readFile(
+				join('./UcodeExamplePrograms', ucodeExampleFiles[exampleProgram]),
 				'utf8'
 			);
 			return data;
@@ -121,5 +149,15 @@ const app = new Elysia()
 console.log(
 	`🦊 Server is running at ${app.server?.hostname}:${app.server?.port}`
 );
+
+// Start ucode LSP WebSocket bridge
+try {
+	startUcodeLspBridge({
+		port: 6005,
+		workspaceRoot: join(process.cwd(), 'ucode-workspace')
+	});
+} catch (err) {
+	console.error('Failed to start ucode LSP bridge:', err);
+}
 
 export { app };

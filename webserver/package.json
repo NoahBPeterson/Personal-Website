@@ -9,6 +9,10 @@
   "dependencies": {
     "@elysiajs/cors": "^0.8.0",
     "@elysiajs/static": "^0.8.1",
-    "elysia": "^0.8.17"
+    "elysia": "^0.8.17",
+    "ucode-lsp": "^0.6.17",
+    "vscode-jsonrpc": "^8.2.0",
+    "vscode-ws-jsonrpc": "^3.4.0",
+    "ws": "^8.18.0"
   }
 }
