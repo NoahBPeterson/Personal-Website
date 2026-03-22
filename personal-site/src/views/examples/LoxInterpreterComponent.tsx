@@ -42,11 +42,16 @@ export default function LoxInterpreterComponent() {
 				'Content-Type': 'application/json',
 			}
 		});
-		const body = await result.json();
-		if (typeof body === 'object' && body.error) {
-			setProgramResult("Error");
-		} else {
-			setProgramResult(typeof body === 'string' ? body : JSON.stringify(body));
+		const text = await result.text();
+		try {
+			const parsed = JSON.parse(text);
+			if (typeof parsed === 'object' && parsed.error) {
+				setProgramResult("Error");
+			} else {
+				setProgramResult(typeof parsed === 'string' ? parsed : text);
+			}
+		} catch {
+			setProgramResult(text);
 		}
 	}
 	
