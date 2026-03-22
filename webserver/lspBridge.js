@@ -50,7 +50,8 @@ export function startUcodeLspBridge(options = {}) {
 	wss.on('connection', (socket) => {
 		console.log('[ucode-lsp] client connected');
 
-		const child = spawn('ucode-lsp', ['--stdio'], {
+		const lspScript = resolve(process.cwd(), 'node_modules/ucode-lsp/bin/ucode-lsp.js');
+		const child = spawn(process.execPath, [lspScript, '--stdio'], {
 			stdio: ['pipe', 'pipe', 'pipe'],
 			cwd: workspaceRoot
 		});
