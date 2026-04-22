@@ -88,16 +88,12 @@ export default function App() {
             <UcodeLspSection />
             <RepetitionPro />
             <div className="section section-navbars">
-              <BackgroundBubbles value={1} />
               <CsLox />
             </div>
-          </section>
-
-          {/* College Projects */}
-          <section id="college-projects" className="section">
-            <BackgroundBubbles value={2} />
-            <BlockTrack />
-            <SpawnerTiers />
+            <section id="college-projects" className="section">
+              <BlockTrack />
+              <SpawnerTiers />
+            </section>
           </section>
         </div>
 
