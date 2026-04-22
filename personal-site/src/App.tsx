@@ -8,11 +8,11 @@ import Footer from "./components/Footer/Footer";
 
 // sections
 import BackgroundBubbles from "./views/ProjectSections/backgroundBubbles";
+import UcodeLspSection from "./views/ProjectSections/ucodeLsp";
+import RepetitionPro from "./views/ProjectSections/repetitionPro";
 import CsLox from "./views/ProjectSections/csLox";
 import BlockTrack from "./views/ProjectSections/blockTrack";
 import SpawnerTiers from "./views/ProjectSections/spawnerTiers";
-import UcodeLspSection from "./views/ProjectSections/ucodeLsp";
-import LoxInterpreterComponent from "./views/examples/LoxInterpreterComponent";
 
 export default function App() {
   const [activeSection, setActiveSection] = useState("home");
@@ -85,13 +85,19 @@ export default function App() {
         <div className="main">
           <section id="projects" className="section section-javascript">
             <BackgroundBubbles value={0} />
-            <CsLox />
+            <UcodeLspSection />
+            <RepetitionPro />
             <div className="section section-navbars">
               <BackgroundBubbles value={1} />
-              <BlockTrack />
-              <SpawnerTiers />
-              <UcodeLspSection />
+              <CsLox />
             </div>
+          </section>
+
+          {/* College Projects */}
+          <section id="college-projects" className="section">
+            <BackgroundBubbles value={2} />
+            <BlockTrack />
+            <SpawnerTiers />
           </section>
         </div>
 
