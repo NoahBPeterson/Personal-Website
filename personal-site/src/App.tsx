@@ -91,6 +91,11 @@ export default function App() {
               <CsLox />
             </div>
             <section id="college-projects" className="section">
+              <Container>
+                <div className="title">
+                  <h1 className="mb-3">College Projects</h1>
+                </div>
+              </Container>
               <BlockTrack />
               <SpawnerTiers />
             </section>
