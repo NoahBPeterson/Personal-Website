@@ -51,6 +51,14 @@ server {
     location /assets/ {
         expires 1y;
         add_header Cache-Control "public, immutable";
+        # Compress text assets on the fly. Nginx's global gzip_types doesn't
+        # cover application/javascript by default, so the main bundle was
+        # going out uncompressed (~281KB instead of ~81KB). Fonts (woff2) and
+        # images are already compressed — don't re-gzip them.
+        gzip on;
+        gzip_vary on;
+        gzip_types text/css application/javascript application/json image/svg+xml;
+        gzip_min_length 512;
         try_files $uri =404;
     }
 
