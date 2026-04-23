@@ -95,7 +95,7 @@ export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
             onClick={handleLogoClick}
             className="cursor-pointer"
           >
-            <img src="icon.png" className="invert" style={{ filter: 'invert(1)' }} alt="Logo" />
+            <img src="/icon.png" className="invert" style={{ filter: 'invert(1)' }} alt="Logo" />
           </NavbarBrand>
           <button
             aria-expanded={collapseOpen}
@@ -117,7 +117,7 @@ export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
           <div className="navbar-collapse-header">
             <Row>
               <Col className="collapse-brand" xs="6">
-                <img src="icon.png" className="invert" style={{ filter: 'invert(1)' }} alt="Logo" />
+                <img src="/icon.png" className="invert" style={{ filter: 'invert(1)' }} alt="Logo" />
               </Col>
               <Col className="collapse-close text-right" xs="6">
                 <button

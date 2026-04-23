@@ -36,14 +36,35 @@ const vite = await createServer({
 try {
 	const { render } = await vite.ssrLoadModule("/src/entry-server.tsx");
 
+	// Vite's dev SSR (ssrLoadModule) resolves `import icon from "assets/img/foo.png"`
+	// to the dev-server URL `/src/assets/img/foo.png`. That path doesn't exist in
+	// the deployed build. Use the client build manifest to rewrite those URLs to
+	// the hashed production paths emitted by `vite build`.
+	const manifestPath = path.join(buildDir, ".vite", "manifest.json");
+	const manifest = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+	const assetRewrites = new Map();
+	for (const [src, entry] of Object.entries(manifest)) {
+		if (entry.file && src.includes("/")) {
+			assetRewrites.set(`/${src}`, `/${entry.file}`);
+		}
+	}
+	const rewriteAssetPaths = (html) => {
+		for (const [from, to] of assetRewrites) {
+			html = html.split(from).join(to);
+		}
+		return html;
+	};
+
 	// Render all routes up-front — PurgeCSS needs the full rendered DOM as
 	// content so it can keep classes that only appear in server output (e.g.
 	// ones reactstrap composes internally).
 	const rendered = routes.map((url) => ({
 		url,
-		html: template.replace(
-			'<div id="root"></div>',
-			`<div id="root">${render(url)}</div>`
+		html: rewriteAssetPaths(
+			template.replace(
+				'<div id="root"></div>',
+				`<div id="root">${render(url)}</div>`
+			)
 		),
 	}));
 

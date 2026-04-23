@@ -7,7 +7,11 @@ export default defineConfig({
   root: '.',
   publicDir: 'public',
   build: {
-    outDir: 'build'
+    outDir: 'build',
+    // Emit `build/.vite/manifest.json` mapping source paths (e.g. `src/assets/img/foo.png`)
+    // to hashed build paths. The prerender script uses this to rewrite dev-style
+    // asset URLs that Vite's SSR dev server inlines during `ssrLoadModule`.
+    manifest: true
   },
   resolve: {
     alias: {
