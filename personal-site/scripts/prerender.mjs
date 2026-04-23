@@ -116,7 +116,11 @@ try {
 			greedy: [/^col-/, /^row/, /^container/, /^btn-/],
 		},
 		keyframes: true,
-		fontFace: true,
+		// Don't purge @font-face. PurgeCSS decides by whether the font-family
+		// name appears in scanned content — but Nucleo (the icon font) is only
+		// referenced via CSS class (`.tim-icons`), not by name, so it got
+		// stripped and the spaceship/cubes icons broke.
+		fontFace: false,
 		variables: true,
 	});
 
@@ -127,16 +131,26 @@ try {
 			`${Buffer.byteLength(purgedCss)} bytes`
 	);
 
-	// Preload the Poppins Latin-400 woff2. The filename is hashed per build,
-	// so we look it up in the assets dir. Without this, fonts don't fetch
-	// until the CSS is parsed — which is late enough to cause a visible
-	// fallback→Poppins swap (FOUT).
-	const poppinsFont = assetFiles.find((f) =>
-		/^poppins-latin-400-normal-.*\.woff2$/.test(f)
-	);
-	const fontPreload = poppinsFont
-		? `<link rel="preload" as="font" type="font/woff2" href="/assets/${poppinsFont}" crossorigin>`
-		: "";
+	// Preload the Poppins weights actually used above the fold: 400 (body)
+	// and 600 (hero heading, page titles). The filenames are hashed per
+	// build so we look them up in the assets dir. Without these, fonts
+	// don't fetch until after CSS parse and inline @font-face evaluation
+	// — late enough to cause a visible fallback→Poppins swap (FOUT).
+	// Nucleo (icon font used by .tim-icons) — same trick: preload so the
+	// spaceship/cubes buttons don't pop in late.
+	const fontPreloads = [];
+	const addFontPreload = (pattern) => {
+		const match = assetFiles.find((f) => pattern.test(f));
+		if (match) {
+			fontPreloads.push(
+				`<link rel="preload" as="font" type="font/woff2" href="/assets/${match}" crossorigin>`
+			);
+		}
+	};
+	addFontPreload(/^poppins-latin-400-normal-.*\.woff2$/);
+	addFontPreload(/^poppins-latin-600-normal-.*\.woff2$/);
+	addFontPreload(/^nucleo-.*\.woff2$/);
+	const fontPreload = fontPreloads.join("\n    ");
 
 	// Beasties inlines critical CSS that matches the prerendered DOM, preloads
 	// the rest. `path` lets it resolve `<link href="/assets/…css">` on disk —
@@ -155,8 +169,14 @@ try {
 	});
 
 	for (const { url, html } of rendered) {
+		// Insert preloads high in <head> — before any <style>/<script> so the
+		// preload scanner picks them up as early as possible. Place right
+		// after the first <meta charset>.
 		const withFontPreload = fontPreload
-			? html.replace("</head>", `    ${fontPreload}\n  </head>`)
+			? html.replace(
+					'<meta charset="UTF-8" />',
+					`<meta charset="UTF-8" />\n    ${fontPreload}`
+				)
 			: html;
 		const inlined = await beasties.process(withFontPreload);
 		const outPath =
