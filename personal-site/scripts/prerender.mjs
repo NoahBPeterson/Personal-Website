@@ -131,25 +131,36 @@ try {
 			`${Buffer.byteLength(purgedCss)} bytes`
 	);
 
-	// Preload the Poppins weights actually used above the fold: 400 (body)
-	// and 600 (hero heading, page titles). The filenames are hashed per
-	// build so we look them up in the assets dir. Without these, fonts
-	// don't fetch until after CSS parse and inline @font-face evaluation
-	// — late enough to cause a visible fallback→Poppins swap (FOUT).
-	// Nucleo (icon font used by .tim-icons) — same trick: preload so the
-	// spaceship/cubes buttons don't pop in late.
-	const fontPreloads = [];
-	const addFontPreload = (pattern) => {
+	// Inline the critical Poppins weights (Latin 400 + 600) as base64 data
+	// URIs in the @font-face rules. On a slow server, even preloaded fonts
+	// can miss first paint — the browser discovers the preload after HTML
+	// arrives, which is already hundreds of ms in. Inlining as data URIs
+	// makes the font available the instant the <style> parses, so there's
+	// no snap, ever. Cost: ~18 KB gzipped extra HTML per page load.
+	const fontInlines = new Map(); // filename → data URI
+	for (const pattern of [
+		/^poppins-latin-400-normal-.*\.woff2$/,
+		/^poppins-latin-600-normal-.*\.woff2$/,
+	]) {
 		const match = assetFiles.find((f) => pattern.test(f));
 		if (match) {
-			fontPreloads.push(
-				`<link rel="preload" as="font" type="font/woff2" href="/assets/${match}" crossorigin>`
+			const bytes = await fs.readFile(path.join(assetsDir, match));
+			fontInlines.set(
+				match,
+				`data:font/woff2;base64,${bytes.toString("base64")}`
 			);
 		}
-	};
-	addFontPreload(/^poppins-latin-400-normal-.*\.woff2$/);
-	addFontPreload(/^poppins-latin-600-normal-.*\.woff2$/);
-	addFontPreload(/^nucleo-.*\.woff2$/);
+	}
+
+	// Nucleo is for icons — preload rather than inline (it's 24 KB, worse
+	// tradeoff, and icons are OK with a brief invisible period).
+	const fontPreloads = [];
+	const nucleoMatch = assetFiles.find((f) => /^nucleo-.*\.woff2$/.test(f));
+	if (nucleoMatch) {
+		fontPreloads.push(
+			`<link rel="preload" as="font" type="font/woff2" href="/assets/${nucleoMatch}" crossorigin>`
+		);
+	}
 	const fontPreload = fontPreloads.join("\n    ");
 
 	// Beasties inlines critical CSS that matches the prerendered DOM, preloads
@@ -178,7 +189,14 @@ try {
 					`<meta charset="UTF-8" />\n    ${fontPreload}`
 				)
 			: html;
-		const inlined = await beasties.process(withFontPreload);
+		let inlined = await beasties.process(withFontPreload);
+
+		// Replace the Poppins 400/600 woff2 URLs with base64 data URIs in
+		// the @font-face rules Beasties just inlined. Do this after Beasties
+		// so it doesn't try to inline the entire data URI into its logic.
+		for (const [filename, dataUri] of fontInlines) {
+			inlined = inlined.split(`/assets/${filename}`).join(dataUri);
+		}
 		const outPath =
 			url === "/"
 				? path.join(buildDir, "index.html")
