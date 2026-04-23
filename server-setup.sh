@@ -47,6 +47,18 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
+    # Hashed build artifacts are immutable — cache aggressively.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # HTML entry points change on every deploy. Let browsers revalidate.
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
     # API proxy
     location /loxOutput {
         proxy_pass http://127.0.0.1:5001;
@@ -77,8 +89,8 @@ server {
         proxy_read_timeout 86400;
     }
 
-    listen [::]:443 ssl ipv6only=on; # managed by Certbot
-    listen 443 ssl; # managed by Certbot
+    listen [::]:443 ssl http2 ipv6only=on; # managed by Certbot
+    listen 443 ssl http2; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/noahpeterson.me-0001/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/noahpeterson.me-0001/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
