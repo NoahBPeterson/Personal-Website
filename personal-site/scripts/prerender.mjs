@@ -55,16 +55,35 @@ try {
 		return html;
 	};
 
+	// Several CSS rules are scoped under a body class that React adds inside
+	// useEffect (e.g. `.index-page .page-header ... .h1-seo`). During SSR
+	// that class is absent, so Beasties thinks those rules don't match
+	// anything on the page and drops them from critical CSS. When the full
+	// CSS + hydration arrive the class appears and styles change visibly —
+	// that's the "snap". Prerender the correct body class per route.
+	const bodyClassByRoute = {
+		"/": "index-page",
+		"/loxInterpreter": "register-page",
+		"/ucode": "register-page",
+	};
+	const applyBodyClass = (html, url) => {
+		const cls = bodyClassByRoute[url];
+		return cls ? html.replace("<body>", `<body class="${cls}">`) : html;
+	};
+
 	// Render all routes up-front — PurgeCSS needs the full rendered DOM as
 	// content so it can keep classes that only appear in server output (e.g.
 	// ones reactstrap composes internally).
 	const rendered = routes.map((url) => ({
 		url,
-		html: rewriteAssetPaths(
-			template.replace(
-				'<div id="root"></div>',
-				`<div id="root">${render(url)}</div>`
-			)
+		html: applyBodyClass(
+			rewriteAssetPaths(
+				template.replace(
+					'<div id="root"></div>',
+					`<div id="root">${render(url)}</div>`
+				)
+			),
+			url
 		),
 	}));
 

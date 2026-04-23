@@ -19,8 +19,10 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    // Add index-page class
-    document.body.classList.toggle("index-page");
+    // Mark body for index-page scoped styles. Use add/remove (not toggle) so
+    // the class is safe to prerender onto <body> — toggle would flip it off
+    // on hydration.
+    document.body.classList.add("index-page");
 
     // Handle initial hash navigation
     const hash = location.hash.replace("#", "");
@@ -50,7 +52,7 @@ export default function App() {
 
     // Cleanup function
     return () => {
-      document.body.classList.toggle("index-page");
+      document.body.classList.remove("index-page");
       observer.disconnect();
     };
   }, [location]);
