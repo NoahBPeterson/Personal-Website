@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {Button, Card, CardBody, Row, Col } from "reactstrap";
 import SyntaxHighlighter from '../../components/SyntaxHighlighter/SyntaxHighlighter';
 
@@ -33,7 +33,8 @@ export default function LoxInterpreterComponent() {
 	const [programResult, setProgramResult] = useState('');
 	const [programExamples, setProgramExamples] = useState<JSX.Element[]>([]);
 	const [exampleText, setExampleText] = useState('');
-	
+	const fetchedRef = useRef(false);
+
 	const runProgram = async () => {
 		const result = await fetch(`${apiBase()}/loxOutput`, {
 			method: 'post',
@@ -56,7 +57,8 @@ export default function LoxInterpreterComponent() {
 	}
 	
 	const getExamples = async () => {
-		if(programExamples.length > 0) return;
+		if (fetchedRef.current) return;
+		fetchedRef.current = true;
 		const result = await fetch(`${apiBase()}/loxExamples`, {
 			method: 'get',
 			headers: {
@@ -90,7 +92,7 @@ export default function LoxInterpreterComponent() {
 		setProgramText(body);
 	}
 
-	getExamples();
+	useEffect(() => { getExamples(); }, []);
 
 	return (
 	<>

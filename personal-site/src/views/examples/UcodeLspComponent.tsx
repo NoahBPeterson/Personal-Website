@@ -1,6 +1,8 @@
 import React from "react";
 import { Card, CardBody, Row, Col } from "reactstrap";
-import UcodeEditor from "./UcodeEditor";
+
+// Monaco is ~1MB gzipped; load it lazily so the initial bundle stays small.
+const UcodeEditor = React.lazy(() => import("./UcodeEditor"));
 
 function apiBase(): string {
 	const hostname = window.location.hostname || "localhost";
@@ -57,7 +59,26 @@ export default function UcodeLspComponent() {
 		<>
 			<Card>
 				<CardBody>
-					<UcodeEditor value={programText} onChange={setProgramText} />
+					<React.Suspense
+						fallback={
+							<div
+								style={{
+									height: "400px",
+									width: "100%",
+									border: "1px solid #333",
+									borderRadius: 8,
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									color: "#666",
+								}}
+							>
+								Loading editor…
+							</div>
+						}
+					>
+						<UcodeEditor value={programText} onChange={setProgramText} />
+					</React.Suspense>
 				</CardBody>
 			</Card>
 			<Row>

@@ -1,7 +1,16 @@
 import React, { useEffect, useRef } from "react";
-import * as monaco from "monaco-editor";
+// Pull only the editor API — skips every built-in language grammar.
+// Syntax highlighting is done manually via TextMate below; language features
+// come from the ucode LSP over WebSocket, so Monaco's language workers aren't
+// needed either.
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import "monaco-editor/min/vs/editor/editor.main.css";
 import ReconnectingWebSocket from "reconnecting-websocket";
+
+(self as any).MonacoEnvironment = {
+	getWorker: () => new EditorWorker(),
+};
 import { createOnigScanner, createOnigString, loadWASM } from "vscode-oniguruma";
 import { Registry, parseRawGrammar, type IGrammar, INITIAL } from "vscode-textmate";
 import ucodeGrammar from "./ucode.tmLanguage.json";

@@ -16,7 +16,7 @@
 
 */
 import React from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import "assets/css/nucleo-icons.css";
@@ -30,8 +30,8 @@ import UcodeLsp from "./views/examples/UcodeLsp";
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element not found');
-const root = createRoot(container);
-root.render(
+
+const tree = (
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App /> } />
@@ -46,3 +46,11 @@ root.render(
     </Routes>
   </BrowserRouter>
 );
+
+// When prerendered HTML is present, hydrate over it. When the container is
+// empty (dev server, or an unrendered route), fall back to a fresh render.
+if (container.hasChildNodes()) {
+  hydrateRoot(container, tree);
+} else {
+  createRoot(container).render(tree);
+}
