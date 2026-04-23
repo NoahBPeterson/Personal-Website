@@ -466,7 +466,10 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 			<div
 				className="ucode-editor-wrapper"
 				ref={containerRef}
-				style={{ height: "400px", width: "100%", border: "1px solid #333", borderRadius: 8 }}
+				// text-align reset: .page-header > .content sets text-align:center
+				// on /ucode, which inherits into Monaco's .view-line (white-space:pre)
+				// and visually shifts every line to the horizontal middle of the line box.
+				style={{ height: "400px", width: "100%", border: "1px solid #333", borderRadius: 8, textAlign: "left" }}
 			/>
 		</>
 	);
