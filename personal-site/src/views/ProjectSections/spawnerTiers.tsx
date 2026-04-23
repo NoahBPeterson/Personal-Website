@@ -31,6 +31,7 @@ import {
 	NavLink,
 } from "reactstrap";
 import SpawnerTiersIcon from "assets/img/SpawnerTiersIcon.png";
+import YouTubeFacade from "../../components/YouTubeFacade/YouTubeFacade";
 
 
 export default function SpawnerTiers() {
@@ -104,11 +105,7 @@ export default function SpawnerTiers() {
 					</Card>
 				</Col>
 				<Col className="ml-auto mr-auto" md="10" xl="6">
-					<iframe width="560" height="315" 
-						src="https://www.youtube.com/embed/lR_137aqd8U"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-						allowFullScreen>
-					</iframe>
+					<YouTubeFacade videoId="lR_137aqd8U" title="SpawnerTiers demo" />
 				</Col>
 			</Row>
 		</Container>

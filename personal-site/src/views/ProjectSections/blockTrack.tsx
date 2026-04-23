@@ -17,6 +17,7 @@
 */
 import React from "react";
 import BlockTrackIcon from "assets/img/BlockTrackIcon.png";
+import YouTubeFacade from "../../components/YouTubeFacade/YouTubeFacade";
 // reactstrap components
 import {
 	TabContent,
@@ -47,10 +48,7 @@ export default function BlockTrack() {
 			</div>
 			<Row>
 				<Col className="ml-auto mr-auto" md="10" xl="6">
-					<iframe width="560" height="315" 
-						src="https://www.youtube.com/embed/k2hY17WVuaU"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-						allowFullScreen/>
+					<YouTubeFacade videoId="k2hY17WVuaU" title="BlockTrack demo" />
 				</Col>
 				<Col className="ml-auto mr-auto" md="10" xl="6">
 					<Card>
