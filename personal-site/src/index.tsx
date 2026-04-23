@@ -19,6 +19,12 @@ import React from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+// Self-hosted Poppins — eliminates the Google Fonts round-trip and the
+// fallback→Poppins snap. Only the weights the design actually uses.
+import "@fontsource/poppins/300.css";
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/600.css";
+
 import "assets/css/nucleo-icons.css";
 import "assets/scss/blk-design-system-react.scss?v=1.2.0";
 import "assets/demo/demo.css";

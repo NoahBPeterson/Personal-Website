@@ -127,6 +127,17 @@ try {
 			`${Buffer.byteLength(purgedCss)} bytes`
 	);
 
+	// Preload the Poppins Latin-400 woff2. The filename is hashed per build,
+	// so we look it up in the assets dir. Without this, fonts don't fetch
+	// until the CSS is parsed — which is late enough to cause a visible
+	// fallback→Poppins swap (FOUT).
+	const poppinsFont = assetFiles.find((f) =>
+		/^poppins-latin-400-normal-.*\.woff2$/.test(f)
+	);
+	const fontPreload = poppinsFont
+		? `<link rel="preload" as="font" type="font/woff2" href="/assets/${poppinsFont}" crossorigin>`
+		: "";
+
 	// Beasties inlines critical CSS that matches the prerendered DOM, preloads
 	// the rest. `path` lets it resolve `<link href="/assets/…css">` on disk —
 	// it reads the now-purged CSS.
@@ -134,11 +145,20 @@ try {
 		path: buildDir,
 		publicPath: "/",
 		preload: "swap",
+		// Inline @font-face rules in the critical CSS. Without this, they sit
+		// in the deferred stylesheet and first paint uses the fallback font
+		// even though the woff2 is already preloaded — causing a visible
+		// fallback→Poppins snap when the CSS eventually loads.
+		inlineFonts: true,
+		preloadFonts: false, // we manually preload only the critical weight
 		logLevel: "silent",
 	});
 
 	for (const { url, html } of rendered) {
-		const inlined = await beasties.process(html);
+		const withFontPreload = fontPreload
+			? html.replace("</head>", `    ${fontPreload}\n  </head>`)
+			: html;
+		const inlined = await beasties.process(withFontPreload);
 		const outPath =
 			url === "/"
 				? path.join(buildDir, "index.html")
