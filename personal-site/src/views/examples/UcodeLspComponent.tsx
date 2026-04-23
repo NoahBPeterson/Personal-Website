@@ -1,8 +1,17 @@
 import React from "react";
 import { Card, CardBody, Row, Col } from "reactstrap";
 
-// Monaco is ~1MB gzipped; load it lazily so the initial bundle stays small.
-const UcodeEditor = React.lazy(() => import("./UcodeEditor"));
+type UcodeEditorComponent = React.ComponentType<{
+	value?: string;
+	onChange?: (code: string) => void;
+}>;
+
+// Monaco is ~1MB gzipped; dynamic-import it from useEffect rather than via
+// React.lazy + Suspense. renderToString can't resolve Suspense on the server,
+// so lazy + Suspense emits a bailout marker that triggers React error #419
+// ("server could not finish this Suspense boundary") on hydration. The effect
+// path renders the same fallback on both server and client until the chunk
+// loads, so hydration stays clean.
 
 function apiBase(): string {
 	const hostname = window.location.hostname || "localhost";
@@ -16,7 +25,16 @@ function apiBase(): string {
 export default function UcodeLspComponent() {
 	const [programText, setProgramText] = React.useState('// Try hovering over functions to see types!\nlet double = x => x * 2;\nlet nums = [1, 2, 3, 4, 5];\n\nlet doubled = map(nums, double);\nlet evens = filter(nums, x => x % 2 == 0);\n\nprintf("Doubled: %s\\n", join(", ", map(doubled, x => "" + x)));\nprintf("Evens: %s\\n", join(", ", map(evens, x => "" + x)));');
 	const [programExamples, setProgramExamples] = React.useState<JSX.Element[]>([]);
+	const [UcodeEditor, setUcodeEditor] = React.useState<UcodeEditorComponent | null>(null);
 	const fetchedRef = React.useRef(false);
+
+	React.useEffect(() => {
+		let cancelled = false;
+		import("./UcodeEditor").then((mod) => {
+			if (!cancelled) setUcodeEditor(() => mod.default);
+		});
+		return () => { cancelled = true; };
+	}, []);
 
 	const getExamples = async () => {
 		if (fetchedRef.current) return;
@@ -59,26 +77,24 @@ export default function UcodeLspComponent() {
 		<>
 			<Card>
 				<CardBody>
-					<React.Suspense
-						fallback={
-							<div
-								style={{
-									height: "400px",
-									width: "100%",
-									border: "1px solid #333",
-									borderRadius: 8,
-									display: "flex",
-									alignItems: "center",
-									justifyContent: "center",
-									color: "#666",
-								}}
-							>
-								Loading editor…
-							</div>
-						}
-					>
+					{UcodeEditor ? (
 						<UcodeEditor value={programText} onChange={setProgramText} />
-					</React.Suspense>
+					) : (
+						<div
+							style={{
+								height: "400px",
+								width: "100%",
+								border: "1px solid #333",
+								borderRadius: 8,
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								color: "#666",
+							}}
+						>
+							Loading editor…
+						</div>
+					)}
 				</CardBody>
 			</Card>
 			<Row>

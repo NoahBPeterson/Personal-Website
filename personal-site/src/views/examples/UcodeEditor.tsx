@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from "react";
-// Pull only the editor API — skips every built-in language grammar.
-// Syntax highlighting is done manually via TextMate below; language features
-// come from the ucode LSP over WebSocket, so Monaco's language workers aren't
-// needed either.
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+// edcore.main = editor core + all contribs (hover, suggest, code actions, …)
+// without the built-in language grammars. editor.api alone exports the
+// `registerHoverProvider`/`registerCompletionItemProvider` functions but
+// doesn't pull in the contributions that actually invoke those providers,
+// so hover/completion silently no-op.
+import * as monaco from "monaco-editor/esm/vs/editor/edcore.main";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import "monaco-editor/min/vs/editor/editor.main.css";
 import ReconnectingWebSocket from "reconnecting-websocket";
