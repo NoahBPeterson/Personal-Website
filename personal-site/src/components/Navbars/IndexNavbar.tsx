@@ -173,6 +173,14 @@ export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
                 <i className="fas fa-cubes" /> Projects
               </Button>
             </NavItem>
+            <NavItem>
+              <Link
+                to="/blog"
+                className={`nav-link btn btn-default d-lg-block ${activeSection === 'blog' ? 'active' : ''}`}
+              >
+                <i className="tim-icons icon-paper" /> Blog
+              </Link>
+            </NavItem>
           </Nav>
         </Collapse>
       </Container>

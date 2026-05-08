@@ -33,6 +33,8 @@ import "./index.css";
 import App from "./App";
 import LoxInterpreter from "./views/examples/LoxInterpreter";
 import UcodeLsp from "./views/examples/UcodeLsp";
+import BlogIndex from "./views/Blog/BlogIndex";
+import BlogPost from "./views/Blog/BlogPost";
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element not found');
@@ -49,6 +51,8 @@ const tree = (
         path="/ucode"
         element={<UcodeLsp /> }
       />
+      <Route path="/blog" element={<BlogIndex />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
     </Routes>
   </BrowserRouter>
 );

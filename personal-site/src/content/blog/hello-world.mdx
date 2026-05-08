@@ -1,0 +1,41 @@
+---
+title: Hello, world
+date: 2026-05-07
+excerpt: A first post to test the new MDX-powered blog setup.
+---
+
+Welcome to the blog. This page is rendered from a single `.mdx` file
+committed to the repository — no CMS, no database, just markdown.
+
+## What works out of the box
+
+- Standard markdown: **bold**, _italic_, `inline code`, [links](https://example.com)
+- GitHub-flavored extras like tables and task lists
+- Fenced code blocks
+- Inline JSX components if I ever need them
+
+## Adding images
+
+Drop an image file next to the post (or anywhere under `src/`), import
+it at the top of the `.mdx`, and reference it like any other React
+asset:
+
+```mdx
+import diagram from "./diagram.png";
+
+<img src={diagram} alt="..." />
+```
+
+Vite hashes the file and ships it through the same pipeline as the
+rest of the site.
+
+## Code
+
+```ts
+function greet(name: string) {
+  return `Hello, ${name}`;
+}
+```
+
+That's it — to publish another post, drop another `.mdx` file into
+`src/content/blog/` with a `title` and `date` in the frontmatter.

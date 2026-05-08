@@ -18,7 +18,7 @@ const root = path.resolve(__dirname, "..");
 const buildDir = path.join(root, "build");
 const assetsDir = path.join(buildDir, "assets");
 
-const routes = ["/", "/loxInterpreter", "/ucode"];
+const staticRoutes = ["/", "/loxInterpreter", "/ucode", "/blog"];
 
 const template = await fs.readFile(path.join(buildDir, "index.html"), "utf-8");
 if (!template.includes('<div id="root"></div>')) {
@@ -34,7 +34,17 @@ const vite = await createServer({
 });
 
 try {
-	const { render } = await vite.ssrLoadModule("/src/entry-server.tsx");
+	const { render, getAllSlugs } = await vite.ssrLoadModule(
+		"/src/entry-server.tsx"
+	);
+
+	// Discover blog posts dynamically — each .mdx in src/content/blog becomes
+	// its own prerendered /blog/<slug>/index.html.
+	const postSlugs = getAllSlugs();
+	const routes = [
+		...staticRoutes,
+		...postSlugs.map((slug) => `/blog/${slug}`),
+	];
 
 	// Vite's dev SSR (ssrLoadModule) resolves `import icon from "assets/img/foo.png"`
 	// to the dev-server URL `/src/assets/img/foo.png`. That path doesn't exist in
@@ -67,7 +77,10 @@ try {
 		"/ucode": "register-page",
 	};
 	const applyBodyClass = (html, url) => {
-		const cls = bodyClassByRoute[url];
+		// All /blog and /blog/<slug> routes share the register-page styling.
+		const cls = url.startsWith("/blog")
+			? "register-page"
+			: bodyClassByRoute[url];
 		return cls ? html.replace("<body>", `<body class="${cls}">`) : html;
 	};
 
@@ -104,6 +117,7 @@ try {
 			...rendered.map((r) => ({ raw: r.html, extension: "html" })),
 			// Classes referenced in source (some only added by JS after hydration).
 			"src/**/*.{tsx,ts,jsx,js}",
+			"src/content/**/*.{mdx,md}",
 			"index.html",
 			// reactstrap composes class names internally; scan its source so we
 			// keep classes like `nav-tabs`, `modal-open`, `fade`, `show`, etc.

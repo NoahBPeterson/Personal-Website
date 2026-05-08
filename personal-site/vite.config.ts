@@ -1,9 +1,28 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import mdx from '@mdx-js/rollup'
+import remarkFrontmatter from 'remark-frontmatter'
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
+import remarkGfm from 'remark-gfm'
 import { resolve } from 'path'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    // MDX must run before the React plugin so the React plugin sees JSX.
+    {
+      enforce: 'pre',
+      ...mdx({
+        providerImportSource: '@mdx-js/react',
+        remarkPlugins: [
+          remarkGfm,
+          remarkFrontmatter,
+          // Exposes parsed frontmatter as a named `frontmatter` export from each .mdx file.
+          [remarkMdxFrontmatter, { name: 'frontmatter' }],
+        ],
+      }),
+    },
+    react({ include: /\.(mdx|js|jsx|ts|tsx)$/ }),
+  ],
   root: '.',
   publicDir: 'public',
   build: {
