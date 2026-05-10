@@ -1,0 +1,21 @@
+flowchart TB
+    A["BackgroundSquares mounts"] --> B["measure parent.scrollHeight"]
+    B --> C{"tileCount =<br/>ceil(height / 600)"}
+    C --> D["for t in 0..tileCount"]
+    D -->|"t even"| E["TILE<br/>(right-heavy layout)"]
+    D -->|"t odd"| F["TILE_FLIPPED<br/>(sides mirrored,<br/>image indices rotated)"]
+    E --> G["per-tile dx/dy<br/>jitter from tileIdx hash"]
+    F --> G
+    G --> H["render 6 squares<br/>at top + dy,<br/>side ± dx"]
+    H --> I["ResizeObserver<br/>on parent"]
+    I -->|"page reflows<br/>e.g. images load"| B
+
+    style A fill:#1f2251,stroke:#e14eca,color:#fff
+    style B fill:#1f2251,stroke:#e14eca,color:#fff
+    style C fill:#1f2251,stroke:#e14eca,color:#fff
+    style D fill:#1f2251,stroke:#e14eca,color:#fff
+    style E fill:#1f2251,stroke:#1d8cf8,color:#fff
+    style F fill:#1f2251,stroke:#1d8cf8,color:#fff
+    style G fill:#1f2251,stroke:#00f2c3,color:#fff
+    style H fill:#1f2251,stroke:#00f2c3,color:#fff
+    style I fill:#1f2251,stroke:#fd5d93,color:#fff

@@ -1,41 +1,343 @@
 ---
-title: Hello, world
-date: 2026-05-07
-excerpt: A first post to test the new MDX-powered blog setup.
+title: Hello, world — and how this blog is built
+date: 2026-05-08
+excerpt: A first post that doubles as a tour of the MDX pipeline, the prerender step, and the self-fitting decorative background that gave me more grief than expected.
 ---
 
-Welcome to the blog. This page is rendered from a single `.mdx` file
-committed to the repository — no CMS, no database, just markdown.
+import buildPipeline from "./diagrams/build-pipeline.svg";
+import postsDiscovery from "./diagrams/posts-discovery.svg";
+import prerenderSequence from "./diagrams/prerender-sequence.svg";
+import squaresLayout from "./diagrams/squares-layout.svg";
+import scrollheightLoop from "./diagrams/scrollheight-loop.svg";
+import hydrationFlow from "./diagrams/hydration-flow.svg";
 
-## What works out of the box
+This is the first post on the new blog. The site you're reading is a
+React + Vite single-page app that gets prerendered to static HTML at
+build time, and the blog is a thin layer of MDX on top of the same
+pipeline that ships the rest of the site. There's no CMS, no backend,
+no runtime markdown parser, and no database — every post is a `.mdx`
+file in `src/content/blog/`, and "publishing" is `git push`.
 
-- Standard markdown: **bold**, _italic_, `inline code`, [links](https://example.com)
-- GitHub-flavored extras like tables and task lists
-- Fenced code blocks
-- Inline JSX components if I ever need them
+I wrote this post mostly as an excuse to go through the setup myself
+and write down the parts that surprised me. If you're looking at this
+and thinking "I want a blog like this on my own site," the short
+version is: you can probably get there in an afternoon, and the
+pieces are simpler than they look. The longer version is the rest of
+this post.
 
-## Adding images
+## What I wanted
 
-Drop an image file next to the post (or anywhere under `src/`), import
-it at the top of the `.mdx`, and reference it like any other React
-asset:
+Two requirements, which between them ruled out most of the
+off-the-shelf options.
 
-```mdx
-import diagram from "./diagram.png";
+1. **Author in plain markdown files committed to the repository.** I
+   wanted "drop a file, push to git" as the publishing flow. No web
+   editor, no API key in a `.env`, nothing that could go down
+   independently of the rest of the site.
+2. **No runtime cost.** The site is already prerendered. Adding a
+   blog shouldn't change that — every post should ship as a static
+   HTML page that hits CDN cache and renders before any JavaScript
+   loads.
 
-<img src={diagram} alt="..." />
-```
+That basically points to two real options: pre-rendered MDX
+(everything compiled at build time and shipped as static HTML), or a
+classic "parse markdown at request time" server. The latter would
+mean adding a runtime dependency to a site that has none. So MDX it
+was.
 
-Vite hashes the file and ships it through the same pipeline as the
-rest of the site.
+The third thing I wanted, which fell out for free, was the ability to
+drop a React component into a post when I needed one. Most posts will
+be straight prose, but every once in a while you want an interactive
+demo, a chart, or just a styled callout. MDX gives you that without
+forcing you to invent a custom shortcode syntax — JSX *is* the
+shortcode syntax.
 
-## Code
+## The build pipeline
+
+Here's the path from a `.mdx` file to a shipped HTML page:
+
+<img src={buildPipeline} alt="Build pipeline diagram showing the path from an MDX file through @mdx-js/rollup, the posts manifest, the React routes, vite build, the prerender script, and PurgeCSS plus Beasties to the final shipped HTML." />
+
+Each box is a step you can read about in isolation. None of them is
+interesting on its own; what's interesting is that the entire chain
+runs as part of `bun run build` and produces real static HTML, with
+critical CSS inlined, that loads before any JavaScript executes.
+
+The first step — turning a `.mdx` file into a React component with a
+parsed `frontmatter` export — is just `@mdx-js/rollup` configured as
+a Vite plugin. The plugin runs `enforce: 'pre'` so MDX is converted
+to JSX before the React plugin sees it. Frontmatter is handled by two
+unified ecosystem plugins: `remark-frontmatter` parses the YAML block
+out of the file, and `remark-mdx-frontmatter` exposes that parsed
+object as a named ESM export so the rest of the app can read it.
 
 ```ts
-function greet(name: string) {
-  return `Hello, ${name}`;
+// vite.config.ts
+mdx({
+  providerImportSource: '@mdx-js/react',
+  remarkPlugins: [
+    remarkGfm,
+    remarkFrontmatter,
+    [remarkMdxFrontmatter, { name: 'frontmatter' }],
+  ],
+})
+```
+
+`remark-gfm` is what gets you tables, task lists, and strikethrough
+without thinking about it. `providerImportSource` lets a page wrap
+MDX content in an `<MDXProvider>` so I can override how things like
+`<img>` render — in this post, that wrapper is what's making sure
+diagram images are responsive without each diagram having to know
+its own width.
+
+## File-based discovery
+
+The next interesting piece is how a `.mdx` file becomes routable.
+There's no static list of posts in the repo. Adding a new post is
+literally creating a new `.mdx` file — the build picks it up from
+there.
+
+<img src={postsDiscovery} alt="Posts discovery diagram showing how import.meta.glob loads every .mdx file under src/content/blog into a manifest, sorts them by date, and exposes posts, getPost, and getAllSlugs to the rest of the app." />
+
+The whole thing is six lines of Vite-flavoured ESM:
+
+```ts
+const modules = import.meta.glob<PostModule>("./*.mdx", { eager: true });
+```
+
+That gives you an object whose keys are file paths and whose values
+are the module's exports — the React component as `default`, and the
+parsed YAML as `frontmatter`. The slug is derived from the filename:
+strip the `./` prefix, strip the `.mdx` extension, that's it. Posts
+are sorted by date descending, and a tiny helper layer (`getPost`,
+`getAllSlugs`) wraps the raw map for the rest of the app.
+
+The wins of doing it this way:
+
+- **No source of truth duplication.** The list of posts *is* the set
+  of `.mdx` files. There's no chance of forgetting to add a post to
+  some manifest.
+- **Frontmatter validation happens at build time.** If you forget the
+  required `title` or `date` fields, the build throws — and it
+  throws with a path so you know which file. No silent "post with no
+  date showed up at the bottom of the list" failures.
+- **`import.meta.glob` knows about file changes.** In dev mode,
+  Vite's HMR picks up new `.mdx` files without a restart.
+
+The one tradeoff is that all posts are bundled into the JS that runs
+the blog routes. For a personal blog with a few dozen posts this
+isn't a real problem — each post is a few KB of compiled JSX. If I
+ever ship hundreds of posts I'd switch to lazy-loading per slug, but
+that's a problem for future me.
+
+## The prerender step
+
+The site builds with regular `vite build`, and then a custom Node
+script (`scripts/prerender.mjs`) runs Vite's SSR APIs to render every
+route to static HTML. That script grew its own personality over time
+— it's also where PurgeCSS strips unused selectors out of the design
+system stylesheet, and where Beasties inlines critical CSS into each
+page's `<head>`. The blog hooks into it cleanly: the SSR entry now
+exports `getAllSlugs` alongside `render`, and the prerender script
+walks those slugs to emit one HTML file per post.
+
+<img src={prerenderSequence} alt="Sequence diagram of the prerender step. Bun runs vite build, gets a template HTML, loads the entry-server module, renders each route to a string, then runs PurgeCSS on the combined output and Beasties on each route, writing final files to build/." />
+
+A couple of subtleties worth flagging:
+
+The CSS that ships is *much* smaller than the source. PurgeCSS scans
+the rendered HTML, the source TSX files, and reactstrap's source —
+that last bit matters because reactstrap composes a lot of class
+names internally that wouldn't be discoverable from the rendered
+DOM. The result is a CSS bundle that's roughly 39% of the original
+size with no visible regressions. Most of what gets stripped is the
+huge surface area of the BLK design system that this site doesn't
+use.
+
+The body class for each route is *prerendered onto the `<body>`
+element*, not added in `useEffect`. The first time I shipped this
+site the body class was added in `useEffect` only, and Beasties (
+which selects critical CSS by walking the prerendered DOM) would
+see a body without `index-page`, fail to match the rule
+`.index-page .h1-seo { font-weight: 600 }`, and drop it from
+critical CSS. Result: a visible "snap" at hydration where the
+heading switched from thin uppercase to bold capitalized as the
+deferred CSS finally loaded and the class was added. Stamping the
+class onto the prerendered HTML fixes the matching. `/blog` gets
+the same treatment — the prerender script knows that any URL
+starting with `/blog` should be rendered with the `register-page`
+body class.
+
+## The decorative background
+
+Most of the body of this post is going to be about the decorative
+background squares behind the text. They look like a small effect,
+and they are, but writing them taught me three different lessons
+about CSS and React that I think are worth documenting.
+
+The first version of the blog, embarrassingly briefly, had a
+hard-coded "blob.png" image dropped inline into the post body
+because I picked a placeholder asset without thinking about whether
+it was actually content. It looked terrible. The next version moved
+the decoration into the page background — a wavy `path5.png` swirl,
+borrowed from the homepage, repeated down the page. That looked
+fine. Then I replaced it with squares, because the squares effect
+that already lived on `/loxInterpreter` and `/ucode` matched the
+site's existing visual language better.
+
+Here's what the final version does:
+
+<img src={squaresLayout} alt="Squares layout diagram. The component mounts, measures parent.scrollHeight, divides by 600 to get a tile count, alternates between TILE and TILE_FLIPPED for variety, applies per-tile dx and dy jitter, and renders six squares per tile. A ResizeObserver re-runs the loop when the page reflows." />
+
+A "tile" is a vertical band 600 pixels tall containing six squares
+arranged so their bounding boxes don't overlap. The component
+measures the page's actual scroll height, divides by 600, and
+generates exactly enough tiles to fill the page. Adjacent tiles
+alternate between a base layout and a mirrored layout (sides
+flipped, image indices rotated) so the repeat doesn't read as
+obviously stamped. Each tile additionally picks a small `(dx, dy)`
+offset from a deterministic hash of its index, so the same big
+square doesn't sit at exactly `right: 100px` on every tile. That
+last touch — the per-tile jitter — was what finally made the
+backgrounds stop looking like a regular grid.
+
+The component takes zero props. Drop `<BackgroundSquares />` into a
+page, give the parent `position: relative; overflow-x: clip`, and
+you get a self-fitting background that grows with content.
+
+### The feedback-loop bug
+
+Here's the bug that took me by surprise. The initial implementation
+positioned each blob (this was during the swirl-blob version) at an
+absolute `top: Npx` inside a container whose overflow was set to
+`visible`. The component measured the parent's `scrollHeight` to
+decide how many blobs to render — and the more blobs it added, the
+more the page grew, because absolutely-positioned descendants
+contribute to `scrollHeight` when they extend past their containing
+block's content edge. So the count kept going up.
+
+<img src={scrollheightLoop} alt="Two-flow diagram comparing overflow:visible to overflow:hidden on the blob layer. The visible flow loops forever as blobs grow scrollHeight which triggers ResizeObserver to add more blobs. The hidden flow stabilizes because clipped overflow doesn't contribute to scrollHeight." />
+
+The visible difference was that the page kept getting taller every
+time you resized the window or as MDX images decoded. The fix is one
+line of CSS:
+
+```css
+.background-squares {
+  overflow: hidden;
 }
 ```
 
-That's it — to publish another post, drop another `.mdx` file into
-`src/content/blog/` with a `title` and `date` in the frontmatter.
+That clips any overflow from the absolutely-positioned children
+inside the squares layer, so they no longer contribute to the
+parent's `scrollHeight`. The measurement loop stabilizes.
+
+Why didn't I just measure something else, like a sibling content
+element? Because that would have meant restructuring the page tree
+to give the content its own measurable wrapper. The `overflow:
+hidden` fix is one CSS declaration and zero TypeScript changes, and
+it composes well with the `overflow-x: clip` already on the parent
+(`overflow: hidden` on the child is independent — it controls
+whether the child's own overflowing children paint outside its box,
+not whether scrolling is allowed on it).
+
+There's a related issue I want to flag because it bit me on the
+follow-up: when the rotation multiplier in `transform: perspective(
+500px) rotateY(...)` is calibrated for a small fixed hero (like the
+login or register page), it's too aggressive for a long blog page
+where the squares cover much more of the visible viewport. The
+original `0.05` multiplier from the LoxInterpreter view felt fine
+in a 60vh hero and felt frantic in a 4000px-tall blog post. Halving
+it to `0.02` for the foreground and `0.008` for the background got
+back to the subtle parallax I actually wanted.
+
+### PurgeCSS and dynamically composed class names
+
+The second thing this component caught was a subtle interaction with
+PurgeCSS. The squares' parallax classes are `bg-square-fast` and
+`bg-square-slow`, and they're applied via a template literal:
+
+```tsx
+<img className={`bg-square bg-square-${parallax}`} />
+```
+
+PurgeCSS scans source files for static class names. It found
+`bg-square` (a literal string) and kept `bg-square-fast` and
+`bg-square-slow` only because of the safelist I added. Without the
+safelist, the variants got stripped out of the CSS bundle and the
+squares rendered without rotation.
+
+```js
+// scripts/prerender.mjs
+safelist: {
+  standard: [
+    /* ... */
+    /^bg-square/,
+  ],
+}
+```
+
+This is one of those classes of bug that doesn't show up in
+development (where Tailwind/PurgeCSS isn't running) and only appears
+in the production bundle. Worth checking any time you're composing
+class names from a runtime value.
+
+## Hydration and the SSR-side count
+
+The squares component starts at `tileCount = 0` and updates after
+mount. That's intentional: the count depends on `parent.scrollHeight`,
+which doesn't exist during SSR (jsdom doesn't run the layout
+algorithm). So the server renders zero squares; the client hydrates,
+matches, and then `useEffect` measures the real DOM and triggers a
+re-render with the correct tile count.
+
+<img src={hydrationFlow} alt="Hydration sequence diagram. The server renders BackgroundSquares with zero tiles. React hydrates the static HTML, matches, then useEffect runs after first paint, reads parent.scrollHeight, and calls setState to render the real tile count. ResizeObserver re-fires as MDX images decode and the page grows further." />
+
+This is the correct shape of "client-only measurement" in React.
+There's a tempting alternative where you'd guess a count server-side
+and update it on the client, but any guess that doesn't exactly
+match the measured count produces a hydration mismatch warning, and
+if the difference is large enough (which it is for blog posts of
+varying length) React falls back to client rendering and you lose
+the SSR benefit entirely. Rendering zero on the server and N after
+mount sidesteps that.
+
+The cost is that the squares "appear" a frame after first paint.
+That's actually fine here — they're decoration, the content is
+already on screen, and the visual transition reads as the parallax
+"settling in" rather than a flash.
+
+## What's next
+
+The blog has a lot of room to grow.
+
+The most obvious thing I want is **per-post cover images** — a
+frontmatter `cover:` field that gets rendered as a hero on the post
+page and a thumbnail on the blog index. The plumbing is all there;
+it's a CSS task and a small frontmatter addition.
+
+I'd also like **tag filtering** at some point, mostly so the index
+can let me thread together posts on the same topic. That's a
+slightly bigger job because it adds new routes (`/blog/tag/<name>`)
+that the prerender script needs to enumerate.
+
+Less urgently, the blog post's main content area is currently fixed
+at `760px` wide, which is fine for prose but cramped for diagrams
+like the ones in this post. A future iteration probably wants
+**variable content widths** — let an MDX block opt into "wide" mode
+to span the full container.
+
+There's also a real **dark/light mode** question that I keep
+deferring. The site's only theme is the dark one, and the diagrams
+in this post are tuned to it. A light mode would mean re-rendering
+every diagram with a light theme variant and serving them
+conditionally, which is doable but more work than it sounds like.
+
+But all of those are extras. The blog as it stands does the thing it
+needed to do: I can drop a `.mdx` file into `src/content/blog/`,
+push to git, and a few minutes later there's a new prerendered post
+on the site. That's the bar I set, and it's the bar it clears. The
+rest is iteration.
+
+If you've made it this far — thanks for reading. The follow-up posts
+will be shorter.

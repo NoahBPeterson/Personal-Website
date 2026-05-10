@@ -1,0 +1,17 @@
+flowchart TB
+    A["src/content/blog/<br/>hello-world.mdx<br/>another-post.mdx<br/>third.mdx"] -->|"import.meta.glob<br/>('./*.mdx', eager: true)"| B["modules:<br/>{ './hello-world.mdx': {default, frontmatter} }<br/>{ './another-post.mdx': {default, frontmatter} }"]
+    B --> C["entries[]<br/>slug = filename minus .mdx"]
+    C -->|"sort by date desc"| D["posts: PostMeta[]<br/>{ slug, title, date, excerpt }"]
+    C --> E["getPost(slug)<br/>getAllSlugs()"]
+    D --> F["BlogIndex renders<br/>cards from posts"]
+    E --> G["BlogPost renders<br/>one MDX module"]
+    E --> H["prerender.mjs<br/>walks slugs to build<br/>/blog/&lt;slug&gt;/index.html"]
+
+    style A fill:#1f2251,stroke:#e14eca,color:#fff
+    style B fill:#1f2251,stroke:#e14eca,color:#fff
+    style C fill:#1f2251,stroke:#e14eca,color:#fff
+    style D fill:#1f2251,stroke:#e14eca,color:#fff
+    style E fill:#1f2251,stroke:#e14eca,color:#fff
+    style F fill:#1f2251,stroke:#1d8cf8,color:#fff
+    style G fill:#1f2251,stroke:#1d8cf8,color:#fff
+    style H fill:#1f2251,stroke:#1d8cf8,color:#fff

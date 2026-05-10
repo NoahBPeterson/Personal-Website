@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant Bun as bun run build
+    participant Vite as vite build
+    participant SSR as vite SSR
+    participant Render as entry-server.render
+    participant Purge as PurgeCSS
+    participant Beasties as Beasties
+    participant FS as build/
+
+    Bun ->> Vite: emit JS, CSS, manifest
+    Vite -->> Bun: index.html template
+    Bun ->> SSR: load entry-server.tsx
+    SSR ->> Render: render each route
+    Render -->> Bun: HTML strings
+    Bun ->> Bun: rewrite dev asset paths
+    Bun ->> Bun: stamp body class per route
+    Bun ->> Purge: scan HTML, src, reactstrap
+    Purge -->> Bun: stripped main CSS
+    loop each route
+        Bun ->> Beasties: inline critical CSS
+        Beasties -->> FS: route index.html
+    end

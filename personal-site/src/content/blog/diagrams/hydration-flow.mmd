@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Server as build SSR
+    participant HTML as static HTML
+    participant React as React client
+    participant DOM as browser DOM
+    participant RAF as ResizeObserver
+
+    Server ->> HTML: render with tileCount = 0
+    HTML -->> React: hydrateRoot
+    React ->> DOM: match server output (zero squares)
+    React ->> React: useEffect runs after paint
+    React ->> DOM: read parent.scrollHeight
+    React ->> React: setTileCount(N)
+    React ->> DOM: re-render with N tiles
+    DOM ->> RAF: layout settles
+    Note over RAF: page may grow as MDX images decode
+    RAF -->> React: ResizeObserver fires
+    React ->> React: recompute tileCount
+    React ->> DOM: add tiles if needed

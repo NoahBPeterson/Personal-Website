@@ -72,26 +72,47 @@ export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+      // block: "start" lands the section's top edge at the viewport top.
+      // "center" used to centre tall sections in the viewport, which made
+      // /#projects and /#interpreter (the latter is nested inside the
+      // former) resolve to nearly identical scroll positions.
+      element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
       setCollapseOpen(false);
     }
   };
 
+  const onHomePage = location.pathname === '/';
+
   const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (location.pathname === '/loxInterpreter') {
-      window.location.href = '/';
-    } else {
+    if (onHomePage) {
+      // Already on the home page — just scroll to the top.
+      e.preventDefault();
       scrollToSection("home");
     }
+    // Otherwise let the <Link to="/"> navigation proceed.
   };
+
+  // Section buttons live on the home page. From any other route we navigate
+  // there with a hash; App.tsx's location-effect picks up the hash on mount
+  // and scrolls to the matching id. From the home page we skip the
+  // navigation and just scroll.
+  const handleSectionClick = (sectionId: string) =>
+    (e: React.MouseEvent) => {
+      if (onHomePage) {
+        e.preventDefault();
+        scrollToSection(sectionId);
+      } else {
+        setCollapseOpen(false);
+      }
+    };
 
   return (
     <Navbar className={`fixed-top ${color} backdrop-blur-sm transition-colors duration-200`} expand="lg">
       <Container>
         <div className="navbar-translate">
-          <NavbarBrand 
-            href="/"
+          <NavbarBrand
+            tag={Link}
+            to="/"
             onClick={handleLogoClick}
             className="cursor-pointer"
           >
@@ -157,18 +178,22 @@ export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
             </NavItem>
             <NavItem>
               <Button
+                tag={Link}
+                to="/#interpreter"
                 className={`nav-link d-lg-block ${activeSection === 'interpreter' ? 'active' : ''}`}
                 color="primary"
-                onClick={() => scrollToSection("interpreter")}
+                onClick={handleSectionClick("interpreter")}
               >
                 <i className="tim-icons icon-spaceship" /> Lox Interpreter
               </Button>
             </NavItem>
             <NavItem>
               <Button
+                tag={Link}
+                to="/#projects"
                 className={`nav-link d-lg-block ${activeSection === 'projects' ? 'active' : ''}`}
                 color="default"
-                onClick={() => scrollToSection("projects")}
+                onClick={handleSectionClick("projects")}
               >
                 <i className="fas fa-cubes" /> Projects
               </Button>

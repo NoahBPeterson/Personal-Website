@@ -5,8 +5,9 @@ import { MDXProvider } from "@mdx-js/react";
 
 import IndexNavbar from "../../components/Navbars/IndexNavbar";
 import Footer from "../../components/Footer/Footer";
-import BackgroundBlobs from "../../components/BackgroundBlobs/BackgroundBlobs";
-import { getPost } from "../../content/blog/posts";
+import BackgroundSquares from "../../components/BackgroundSquares/BackgroundSquares";
+import PostNav from "../../components/Blog/PostNav";
+import { getPost, getAdjacentPosts } from "../../content/blog/posts";
 
 function formatDate(iso: string): string {
 	const d = new Date(iso);
@@ -64,15 +65,16 @@ export default function BlogPost({ slug: slugProp }: BlogPostProps): JSX.Element
 	}
 
 	const { default: PostBody, frontmatter } = post;
+	const { newer, older } = getAdjacentPosts(slug ?? "");
 
 	return (
 		<>
 			<IndexNavbar activeSection="blog" />
 			<div className="wrapper">
 				<div className="blog-page">
-					<BackgroundBlobs />
+					<BackgroundSquares />
 					<Container>
-						<div className="mx-auto" style={{ maxWidth: 760 }}>
+						<article className="blog-post-panel mx-auto">
 							<header className="blog-header">
 								<h1 className="title" style={{ marginBottom: "0.5rem" }}>
 									{frontmatter.title}
@@ -91,9 +93,12 @@ export default function BlogPost({ slug: slugProp }: BlogPostProps): JSX.Element
 									<PostBody />
 								</MDXProvider>
 								<hr className="my-5" />
-								<Link to="/blog">← Back to blog</Link>
+								<PostNav newer={newer} older={older} />
+								<p className="mt-4 mb-0">
+									<Link to="/blog">← Back to blog</Link>
+								</p>
 							</div>
-						</div>
+						</article>
 					</Container>
 				</div>
 				<Footer />

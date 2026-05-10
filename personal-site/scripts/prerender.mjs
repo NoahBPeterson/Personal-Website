@@ -34,15 +34,31 @@ const vite = await createServer({
 });
 
 try {
-	const { render, getAllSlugs } = await vite.ssrLoadModule(
-		"/src/entry-server.tsx"
-	);
+	const {
+		render,
+		getAllSlugs,
+		getPageCount,
+		getYearCounts,
+		posts,
+		generateAtomFeed,
+	} = await vite.ssrLoadModule("/src/entry-server.tsx");
 
 	// Discover blog posts dynamically — each .mdx in src/content/blog becomes
-	// its own prerendered /blog/<slug>/index.html.
+	// its own prerendered /blog/<slug>/index.html. Pagination pages 2..N also
+	// get prerendered; page 1 is the canonical /blog (already in staticRoutes).
 	const postSlugs = getAllSlugs();
+	const pageCount = getPageCount();
+	const pageRoutes = [];
+	for (let p = 2; p <= pageCount; p++) {
+		pageRoutes.push(`/blog/page/${p}`);
+	}
+	const yearRoutes = getYearCounts().map(
+		({ year }) => `/blog/archive/${year}`
+	);
 	const routes = [
 		...staticRoutes,
+		...pageRoutes,
+		...yearRoutes,
 		...postSlugs.map((slug) => `/blog/${slug}`),
 	];
 
@@ -144,6 +160,10 @@ try {
 				/^index-page$/,
 				/^register-page$/,
 				/^perfect-scrollbar/,
+				// BackgroundSquares composes className via template literal
+				// (bg-square-${"fast"|"slow"}), so the variant classes never
+				// appear as static strings PurgeCSS can find.
+				/^bg-square/,
 			],
 			deep: [/:not/, /:hover/, /:focus/, /:active/, /:disabled/, /:checked/],
 			greedy: [/^col-/, /^row/, /^container/, /^btn-/],
@@ -212,6 +232,9 @@ try {
 		logLevel: "silent",
 	});
 
+	const atomLink =
+		'<link rel="alternate" type="application/atom+xml" title="Blog feed" href="/blog/feed.xml">';
+
 	for (const { url, html } of rendered) {
 		// Insert preloads high in <head> — before any <style>/<script> so the
 		// preload scanner picks them up as early as possible. Place right
@@ -222,7 +245,11 @@ try {
 					`<meta charset="UTF-8" />\n    ${fontPreload}`
 				)
 			: html;
-		let inlined = await beasties.process(withFontPreload);
+		// Discoverable Atom feed link on every /blog* route.
+		const withAtomLink = url.startsWith("/blog")
+			? withFontPreload.replace("</head>", `    ${atomLink}\n  </head>`)
+			: withFontPreload;
+		let inlined = await beasties.process(withAtomLink);
 
 		// Replace the Poppins 400/600 woff2 URLs with base64 data URIs in
 		// the @font-face rules Beasties just inlined. Do this after Beasties
@@ -238,6 +265,17 @@ try {
 		await fs.writeFile(outPath, inlined);
 		console.log(`prerendered ${url} → ${path.relative(root, outPath)}`);
 	}
+
+	// Atom feed at /blog/feed.xml. Generator lives in src/content/blog/feed.ts
+	// so it's shared with the dev server middleware in vite.config.ts; the URL
+	// is hard-coded against the production hostname — adjust if you move the
+	// site.
+	const SITE_URL = "https://noahpeterson.me";
+	const feedXml = generateAtomFeed(posts, SITE_URL);
+	const feedPath = path.join(buildDir, "blog", "feed.xml");
+	await fs.mkdir(path.dirname(feedPath), { recursive: true });
+	await fs.writeFile(feedPath, feedXml);
+	console.log(`wrote ${path.relative(root, feedPath)}`);
 } finally {
 	await vite.close();
 }

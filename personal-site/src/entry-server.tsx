@@ -17,19 +17,29 @@ import LoxInterpreter from "./views/examples/LoxInterpreter";
 import UcodeLsp from "./views/examples/UcodeLsp";
 import BlogIndex from "./views/Blog/BlogIndex";
 import BlogPost from "./views/Blog/BlogPost";
+import ScrollToTop from "./components/ScrollToTop";
 
 export function render(url: string): string {
 	return renderToString(
 		<StaticRouter location={url}>
+			<ScrollToTop />
 			<Routes>
 				<Route path="/" element={<App />} />
 				<Route path="/loxInterpreter" element={<LoxInterpreter />} />
 				<Route path="/ucode" element={<UcodeLsp />} />
 				<Route path="/blog" element={<BlogIndex />} />
+				<Route path="/blog/page/:page" element={<BlogIndex />} />
+				<Route path="/blog/archive/:year" element={<BlogIndex />} />
 				<Route path="/blog/:slug" element={<BlogPost />} />
 			</Routes>
 		</StaticRouter>
 	);
 }
 
-export { getAllSlugs } from "./content/blog/posts";
+export {
+	getAllSlugs,
+	getPageCount,
+	getYearCounts,
+	posts,
+} from "./content/blog/posts";
+export { generateAtomFeed } from "./content/blog/feed";

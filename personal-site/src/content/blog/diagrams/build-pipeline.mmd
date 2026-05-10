@@ -1,0 +1,15 @@
+flowchart LR
+    A[".mdx file<br/>in src/content/blog"] -->|"@mdx-js/rollup"| B["React component<br/>+ frontmatter export"]
+    B -->|"import.meta.glob"| C["posts.ts<br/>manifest"]
+    C --> D["BlogIndex<br/>BlogPost"]
+    D -->|"vite build"| E["client bundle<br/>+ entry-server"]
+    E -->|"prerender.mjs<br/>(SSR)"| F["build/blog/&lt;slug&gt;<br/>/index.html"]
+    F -->|"PurgeCSS + Beasties"| G["shipped HTML<br/>with critical CSS"]
+
+    style A fill:#1f2251,stroke:#e14eca,color:#fff
+    style B fill:#1f2251,stroke:#e14eca,color:#fff
+    style C fill:#1f2251,stroke:#e14eca,color:#fff
+    style D fill:#1f2251,stroke:#e14eca,color:#fff
+    style E fill:#1f2251,stroke:#e14eca,color:#fff
+    style F fill:#1f2251,stroke:#e14eca,color:#fff
+    style G fill:#1f2251,stroke:#1d8cf8,color:#fff
