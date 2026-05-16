@@ -5,7 +5,12 @@ import { posts } from "../../content/blog/posts";
 function formatShortDate(iso: string): string {
 	const d = new Date(iso);
 	if (Number.isNaN(d.getTime())) return iso;
-	return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+	// Format in UTC — see note in BlogIndex.formatDate.
+	return d.toLocaleDateString(undefined, {
+		month: "short",
+		day: "numeric",
+		timeZone: "UTC",
+	});
 }
 
 export default function RecentPosts({

@@ -3,3 +3,4 @@ node_modules/
 *.bat
 webserver/LoxPrograms
 *.URL
+.DS_Store

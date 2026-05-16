@@ -16,10 +16,14 @@ import {
 function formatDate(iso: string): string {
 	const d = new Date(iso);
 	if (Number.isNaN(d.getTime())) return iso;
+	// Frontmatter dates are bare YYYY-MM-DD, which Date parses as UTC midnight.
+	// Format in UTC so a viewer in a negative-offset timezone doesn't see the
+	// previous day.
 	return d.toLocaleDateString(undefined, {
 		year: "numeric",
 		month: "long",
 		day: "numeric",
+		timeZone: "UTC",
 	});
 }
 

@@ -12,10 +12,13 @@ import { getPost, getAdjacentPosts } from "../../content/blog/posts";
 function formatDate(iso: string): string {
 	const d = new Date(iso);
 	if (Number.isNaN(d.getTime())) return iso;
+	// Frontmatter dates are bare YYYY-MM-DD → parsed as UTC midnight. Format in
+	// UTC so viewers in negative-offset timezones don't see the previous day.
 	return d.toLocaleDateString(undefined, {
 		year: "numeric",
 		month: "long",
 		day: "numeric",
+		timeZone: "UTC",
 	});
 }
 
