@@ -29,6 +29,10 @@ if (!template.includes('<div id="root"></div>')) {
 
 const vite = await createServer({
 	root,
+	// `mode: 'production'` makes import.meta.env.PROD = true inside the SSR-loaded
+	// modules, which is how posts.ts decides whether to include draft posts.
+	// Without this, the dev-mode SSR would happily prerender drafts.
+	mode: "production",
 	appType: "custom",
 	server: { middlewareMode: true },
 });

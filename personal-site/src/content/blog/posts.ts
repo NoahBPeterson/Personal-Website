@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import type { ComponentType } from "react";
 
 export interface PostFrontmatter {
@@ -5,6 +6,11 @@ export interface PostFrontmatter {
 	date: string; // ISO date, e.g. "2026-05-07"
 	excerpt?: string;
 	cover?: string;
+	// When true the post is hidden from the production build but stays
+	// visible in `bun run dev` so it can be previewed. The production build
+	// is the `vite build` + `scripts/prerender.mjs` run; see the
+	// `mode: 'production'` on that script's createServer.
+	draft?: boolean;
 }
 
 export interface PostModule {
@@ -20,17 +26,28 @@ export interface PostMeta extends PostFrontmatter {
 // Filename (without extension) becomes the slug.
 const modules = import.meta.glob<PostModule>("./*.mdx", { eager: true });
 
+// Drafts (frontmatter `draft: true`) stay visible in dev so the author can
+// preview them, but are stripped from production builds. Check `MODE`
+// instead of `PROD`/`DEV` because Vite ties those flags to `vite build` vs
+// `createServer`, not the actual mode — the prerender script uses
+// createServer with mode:'production', and only MODE responds to that.
+// Every downstream helper — pagination, archive, feed, adjacency — derives
+// from `entries`, so this single filter is enough.
+const includeDrafts = import.meta.env.MODE !== "production";
+
 const entries: Array<{ slug: string; module: PostModule }> = Object.entries(
 	modules
-).map(([path, module]) => {
-	const slug = path.replace(/^\.\//, "").replace(/\.mdx$/, "");
-	if (!module.frontmatter) {
-		throw new Error(
-			`Post ${path} is missing frontmatter (need title and date)`
-		);
-	}
-	return { slug, module };
-});
+)
+	.map(([path, module]) => {
+		const slug = path.replace(/^\.\//, "").replace(/\.mdx$/, "");
+		if (!module.frontmatter) {
+			throw new Error(
+				`Post ${path} is missing frontmatter (need title and date)`
+			);
+		}
+		return { slug, module };
+	})
+	.filter(({ module }) => includeDrafts || !module.frontmatter.draft);
 
 export const posts: PostMeta[] = entries
 	.map(({ slug, module }) => ({ slug, ...module.frontmatter }))
