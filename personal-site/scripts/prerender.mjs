@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import Beasties from "beasties";
 import { PurgeCSS } from "purgecss";
+import { renderOgCard } from "./og-card.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -19,6 +20,7 @@ const buildDir = path.join(root, "build");
 const assetsDir = path.join(buildDir, "assets");
 
 const staticRoutes = ["/", "/loxInterpreter", "/ucode", "/blog"];
+const SITE_URL = "https://noahpeterson.me";
 
 const template = await fs.readFile(path.join(buildDir, "index.html"), "utf-8");
 if (!template.includes('<div id="root"></div>')) {
@@ -104,17 +106,95 @@ try {
 		return cls ? html.replace("<body>", `<body class="${cls}">`) : html;
 	};
 
+	// Link previews (BlueSky, Slack, iMessage, etc.) read Open Graph + Twitter
+	// Card tags. index.html ships site-wide defaults; per-blog-post overrides
+	// happen here because the route-specific frontmatter isn't in the React
+	// tree at HTML-write time.
+	const escapeAttr = (s) =>
+		String(s)
+			.replace(/&/g, "&amp;")
+			.replace(/"/g, "&quot;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;");
+	const setMeta = (html, key, value, useProperty) => {
+		const attr = useProperty ? "property" : "name";
+		const re = new RegExp(
+			`<meta ${attr}="${key}" content="[^"]*"\\s*/?>`
+		);
+		return html.replace(
+			re,
+			`<meta ${attr}="${key}" content="${escapeAttr(value)}" />`
+		);
+	};
+	const postsBySlug = new Map(posts.map((p) => [p.slug, p]));
+
+	// Auto-generate an OG card PNG for every post that doesn't set its own
+	// `cover:` in frontmatter, styled to match the site (see scripts/og-card.mjs).
+	// Posts WITH a `cover:` keep their hand-made image. Result is a site-root
+	// path (/og/<slug>.png) used as that post's og:image below.
+	const ogDir = path.join(buildDir, "og");
+	await fs.mkdir(ogDir, { recursive: true });
+	const cardImageBySlug = new Map();
+	for (const post of posts) {
+		if (post.cover) continue;
+		const png = await renderOgCard({
+			title: post.title,
+			excerpt: post.excerpt,
+		});
+		await fs.writeFile(path.join(ogDir, `${post.slug}.png`), png);
+		cardImageBySlug.set(post.slug, `/og/${post.slug}.png`);
+		console.log(`generated og card → build/og/${post.slug}.png`);
+	}
+
+	const applyOgTags = (html, url) => {
+		// Every page gets its own canonical og:url.
+		let out = setMeta(html, "og:url", `${SITE_URL}${url}`, true);
+
+		const slugMatch = url.match(/^\/blog\/([^/]+)$/);
+		const post = slugMatch ? postsBySlug.get(slugMatch[1]) : null;
+		if (!post) return out;
+
+		const description = post.excerpt ?? "Blog post by Noah Peterson.";
+
+		out = setMeta(out, "og:type", "article", true);
+		out = setMeta(out, "og:title", post.title, true);
+		out = setMeta(out, "og:description", description, true);
+		out = setMeta(out, "twitter:title", post.title, false);
+		out = setMeta(out, "twitter:description", description, false);
+
+		// `cover` (absolute URL or site-root path) wins; otherwise fall back to
+		// the auto-generated card. Either way the post gets a real og:image.
+		const image = post.cover ?? cardImageBySlug.get(post.slug);
+		if (image) {
+			const abs = /^https?:\/\//.test(image)
+				? image
+				: `${SITE_URL}${image}`;
+			out = setMeta(out, "og:image", abs, true);
+			out = setMeta(out, "twitter:image", abs, false);
+		}
+		out = out.replace(
+			"</head>",
+			`    <meta property="article:published_time" content="${escapeAttr(
+				post.date
+			)}" />\n  </head>`
+		);
+		return out;
+	};
+
 	// Render all routes up-front — PurgeCSS needs the full rendered DOM as
 	// content so it can keep classes that only appear in server output (e.g.
 	// ones reactstrap composes internally).
 	const rendered = routes.map((url) => ({
 		url,
-		html: applyBodyClass(
-			rewriteAssetPaths(
-				template.replace(
-					'<div id="root"></div>',
-					`<div id="root">${render(url)}</div>`
-				)
+		html: applyOgTags(
+			applyBodyClass(
+				rewriteAssetPaths(
+					template.replace(
+						'<div id="root"></div>',
+						`<div id="root">${render(url)}</div>`
+					)
+				),
+				url
 			),
 			url
 		),
@@ -271,10 +351,7 @@ try {
 	}
 
 	// Atom feed at /blog/feed.xml. Generator lives in src/content/blog/feed.ts
-	// so it's shared with the dev server middleware in vite.config.ts; the URL
-	// is hard-coded against the production hostname — adjust if you move the
-	// site.
-	const SITE_URL = "https://noahpeterson.me";
+	// so it's shared with the dev server middleware in vite.config.ts.
 	const feedXml = generateAtomFeed(posts, SITE_URL);
 	const feedPath = path.join(buildDir, "blog", "feed.xml");
 	await fs.mkdir(path.dirname(feedPath), { recursive: true });

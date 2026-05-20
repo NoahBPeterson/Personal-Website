@@ -91,6 +91,21 @@ export default function BlogPost({ slug: slugProp }: BlogPostProps): JSX.Element
 									{formatDate(frontmatter.date)}
 								</p>
 							</header>
+							{frontmatter.cover && (
+								<img
+									src={frontmatter.cover}
+									alt=""
+									width={1200}
+									height={630}
+									style={{
+										display: "block",
+										width: "100%",
+										height: "auto",
+										borderRadius: 6,
+										marginTop: "1.5rem",
+									}}
+								/>
+							)}
 							<div className="blog-post">
 								<MDXProvider components={mdxComponents}>
 									<PostBody />
