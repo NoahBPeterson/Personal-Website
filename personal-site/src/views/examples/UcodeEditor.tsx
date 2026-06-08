@@ -34,7 +34,7 @@ class LspConnection {
 
 	constructor(url: string) {
 		this.socket = new ReconnectingWebSocket(url, [], { maxRetries: 10 });
-        this.socket.addEventListener('message', async (event) => {
+        this.socket.addEventListener('message', (event: MessageEvent) => { void (async () => {
 			try {
 				const msg: JSONRPCMessage = JSON.parse(event.data);
                 // Response from server to a request we sent
@@ -64,7 +64,7 @@ class LspConnection {
 			} catch (e) {
 				console.error('LSP message parse error', e);
 			}
-		});
+		})(); });
 	}
 
 	sendRequest(method: string, params: any): Promise<any> {
@@ -203,6 +203,14 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 
 		const disposables: monaco.IDisposable[] = [];
 
+		// Fired to tell Monaco "inlay hints changed, re-request them". Monaco asks
+		// for inlay hints once, early — before the LSP has connected and analyzed
+		// the document — so the first request comes back empty and is never retried.
+		// We fire this when diagnostics arrive (i.e. the server finished analysis),
+		// which makes the hints show up on load and refresh after edits.
+		const inlayHintsEmitter = new monaco.Emitter<void>();
+		disposables.push(inlayHintsEmitter);
+
 		// Wire up TextMate grammar for syntax highlighting
 		getGrammar().then((grammar) => {
 			if (!grammar) return;
@@ -240,6 +248,7 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 			theme: "ucode-dark",
 			automaticLayout: true,
 			minimap: { enabled: false },
+			inlayHints: { enabled: "on" },
 			fixedOverflowWidgets: true,
 			wordWrap: "on",
 			scrollbar: {
@@ -279,7 +288,8 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 						hover: { contentFormat: ['markdown', 'plaintext'] },
 						completion: {
 							completionItem: { snippetSupport: false, documentationFormat: ['markdown', 'plaintext'] }
-						}
+						},
+						inlayHint: { resolveSupport: { properties: ['tooltip'] } }
 					}
 				},
 				workspaceFolders: null
@@ -338,11 +348,13 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 				code: d.code,
 			}));
 			monaco.editor.setModelMarkers(model, 'ucode', markers);
+			// Analysis just completed — prompt Monaco to (re)fetch inlay hints.
+			inlayHintsEmitter.fire();
 		});
 
 		// Code Actions (Quick Fixes)
 		disposables.push(monaco.languages.registerCodeActionProvider('ucode', {
-			provideCodeActions: async (m, range, context) => {
+			provideCodeActions: async (m: monaco.editor.ITextModel, range: monaco.Range, context: monaco.languages.CodeActionContext) => {
 				// Match raw LSP diagnostics to the markers in this range
 				const lspRange = {
 					start: { line: range.startLineNumber - 1, character: range.startColumn - 1 },
@@ -360,7 +372,7 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 				const result = await lsp.sendRequest('textDocument/codeAction', params);
 				if (!result || !Array.isArray(result)) return { actions: [], dispose: () => {} };
 				const actions: monaco.languages.CodeAction[] = result.map((action: any) => {
-					const edits: monaco.languages.WorkspaceTextEdit[] = [];
+					const edits: monaco.languages.IWorkspaceTextEdit[] = [];
 					// Handle edit.changes
 					if (action.edit?.changes) {
 						for (const [, changes] of Object.entries(action.edit.changes as Record<string, any[]>)) {
@@ -413,7 +425,7 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 		// Completion
 		disposables.push(monaco.languages.registerCompletionItemProvider('ucode', {
 			triggerCharacters: ['.', '\'', '"', ',', '('],
-			provideCompletionItems: async (m, position) => {
+			provideCompletionItems: async (m: monaco.editor.ITextModel, position: monaco.Position) => {
 				const result = await lsp.sendRequest('textDocument/completion', {
 					textDocument: { uri },
 					position: { line: position.lineNumber - 1, character: position.column - 1 }
@@ -431,7 +443,7 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 
 		// Hover
 		disposables.push(monaco.languages.registerHoverProvider('ucode', {
-			provideHover: async (m, position) => {
+			provideHover: async (m: monaco.editor.ITextModel, position: monaco.Position) => {
 				const result = await lsp.sendRequest('textDocument/hover', {
 					textDocument: { uri },
 					position: { line: position.lineNumber - 1, character: position.column - 1 }
@@ -439,6 +451,41 @@ export default function UcodeEditor({ value, onChange }: UcodeEditorProps) {
 				if (!result) return { contents: [] };
 				const contents = Array.isArray(result.contents) ? result.contents : [result.contents];
 				return { contents: contents.map((c: any) => (typeof c === 'string' ? { value: c } : c)) } as monaco.languages.Hover;
+			}
+		}));
+
+		// Inlay hints (inline type + parameter-name annotations).
+		// LSP and Monaco share the same InlayHintKind values (Type=1, Parameter=2),
+		// but LSP positions are 0-based and Monaco's are 1-based.
+		const toTooltip = (t: any) => (typeof t === 'string' ? t : t?.value);
+		disposables.push(monaco.languages.registerInlayHintsProvider('ucode', {
+			onDidChangeInlayHints: inlayHintsEmitter.event,
+			provideInlayHints: async (m: monaco.editor.ITextModel) => {
+				// Always request hints for the WHOLE document, ignoring the viewport
+				// sub-range Monaco passes. Monaco re-invokes this on scroll/edit with
+				// varying ranges; forwarding those made the server return different
+				// subsets each time, so hints flickered in and out — and with wordWrap
+				// on, the shorter lines re-wrapped, visibly jumping text between rows.
+				const lastLine = m.getLineCount();
+				const result = await lsp.sendRequest('textDocument/inlayHint', {
+					textDocument: { uri },
+					range: {
+						start: { line: 0, character: 0 },
+						end: { line: lastLine - 1, character: Math.max(0, m.getLineMaxColumn(lastLine) - 1) }
+					}
+				});
+				if (!Array.isArray(result)) return { hints: [], dispose: () => {} };
+				const hints = result.map((h: any) => ({
+					position: { lineNumber: h.position.line + 1, column: h.position.character + 1 },
+					label: typeof h.label === 'string'
+						? h.label
+						: h.label.map((p: any) => ({ label: p.value, tooltip: toTooltip(p.tooltip) })),
+					kind: h.kind,
+					paddingLeft: h.paddingLeft,
+					paddingRight: h.paddingRight,
+					tooltip: toTooltip(h.tooltip),
+				} as monaco.languages.InlayHint));
+				return { hints, dispose: () => {} };
 			}
 		}));
 

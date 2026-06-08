@@ -32,10 +32,11 @@ import {
 } from "reactstrap";
 
 interface IndexNavbarProps {
-  activeSection: string;
+  // Optional: the home page has no active section, so no nav link is highlighted.
+  activeSection?: string;
 }
 
-export default function IndexNavbar({ activeSection }: IndexNavbarProps) {
+export default function IndexNavbar({ activeSection = "" }: IndexNavbarProps) {
   const location = useLocation();
   const [collapseOpen, setCollapseOpen] = React.useState(false);
   const [collapseOut, setCollapseOut] = React.useState("");
