@@ -441,6 +441,16 @@
     border-radius: $border-radius-sm;
     padding: 1.4rem;
   }
+
+  // Below 992px the nav links render as full pill buttons in the dropdown menu.
+  // The desktop `.navbar-expand-lg .navbar-nav .nav-link` padding rule only
+  // applies at min-width:992px, so here they fall back to the theme's base
+  // `.nav-link` (zero horizontal padding) and the icon/text touch the pill
+  // edges. Restore horizontal padding for the collapsed menu.
+  .navbar-collapse .navbar-nav .nav-link {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
 }
 @media screen and (max-width: 576px){
   .navbar[class*='navbar-toggleable-'] .container{
